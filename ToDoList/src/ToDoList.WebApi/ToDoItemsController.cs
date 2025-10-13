@@ -13,7 +13,7 @@ public class ToDoItemsController : ControllerBase
     [HttpPost]
     public IActionResult Create(ToDoItemCreateRequestDto request) //použijeme DTO = Data Transfer Object
     {
-        ToDoItem item = request.ToDomain();
+        var item = request.ToDomain();
 
         try
         {
@@ -25,13 +25,26 @@ public class ToDoItemsController : ControllerBase
             return Problem(e.Message, null, StatusCodes.Status500InternalServerError);
         }
 
-        return CreatedAtAction(nameof(ReadById), new { ToDoItemId = item.ToDoItemId }, item);
+        return CreatedAtAction(nameof(ReadById), new { item.ToDoItemId }, item);
     }
 
     [HttpGet]
     public IActionResult Read()
     {
-        return Ok();
+        try
+        {
+            if (items.Count == 0)
+            {
+                return NotFound();
+            }
+
+            var dtoList = items.Select(ToDoItemGetResponseDto.FromDomain).ToList();
+            return Ok(dtoList);
+        }
+        catch (Exception e)
+        {
+            return Problem(e.Message, null, StatusCodes.Status500InternalServerError);
+        }
     }
 
     [HttpGet("{toDoItemId:int}")]
