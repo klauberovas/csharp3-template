@@ -4,14 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
 using ToDoList.Domain.Models;
 
-[Route("api/[controller]")] //localhost::5000/api/ToDoItems
+[Route("api/[controller]")]
 [ApiController]
 public class ToDoItemsController : ControllerBase
 {
     private static readonly List<ToDoItem> Items = [];
 
     [HttpPost]
-    public IActionResult Create(ToDoItemCreateRequestDto request) //použijeme DTO = Data Transfer Object
+    public IActionResult Create(ToDoItemCreateRequestDto request)
     {
         var item = request.ToDomain();
 
