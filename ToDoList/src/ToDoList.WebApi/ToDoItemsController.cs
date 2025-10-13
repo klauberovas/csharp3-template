@@ -93,6 +93,22 @@ public class ToDoItemsController : ControllerBase
     [HttpDelete("{toDoItemId:int}")]
     public IActionResult DeleteById(int toDoItemId)
     {
-        return Ok();
+        try
+        {
+            int index = items.FindIndex(i => i.ToDoItemId == toDoItemId);
+
+            if (index == -1)
+            {
+                return NotFound();
+            }
+
+            items.RemoveAt(index);
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
+        }
     }
 }
