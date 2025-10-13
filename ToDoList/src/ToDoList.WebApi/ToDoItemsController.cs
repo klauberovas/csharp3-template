@@ -13,7 +13,19 @@ public class ToDoItemsController : ControllerBase
     [HttpPost]
     public IActionResult Create(ToDoItemCreateRequestDto request) //použijeme DTO = Data Transfer Object
     {
-        return Ok();
+        ToDoItem item = request.ToDomain();
+
+        try
+        {
+            item.ToDoItemId = items.Count == 0 ? 1 : items.Max(o => o.ToDoItemId) + 1;
+            items.Add(item);
+        }
+        catch (Exception e)
+        {
+            return Problem(e.Message, null, StatusCodes.Status500InternalServerError);
+        }
+
+        return CreatedAtAction(nameof(ReadById), new { ToDoItemId = item.ToDoItemId }, item);
     }
 
     [HttpGet]
