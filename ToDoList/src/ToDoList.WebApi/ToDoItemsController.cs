@@ -20,9 +20,9 @@ public class ToDoItemsController : ControllerBase
             item.ToDoItemId = items.Count == 0 ? 1 : items.Max(o => o.ToDoItemId) + 1;
             items.Add(item);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            return Problem(e.Message, null, StatusCodes.Status500InternalServerError);
+            return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
         }
 
         return CreatedAtAction(nameof(ReadById), new { item.ToDoItemId }, item);
@@ -41,9 +41,9 @@ public class ToDoItemsController : ControllerBase
             var dtoList = items.Select(ToDoItemGetResponseDto.FromDomain).ToList();
             return Ok(dtoList);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            return Problem(e.Message, null, StatusCodes.Status500InternalServerError);
+            return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -52,14 +52,14 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            var toDoItemById = items.Find(i => i.ToDoItemId == toDoItemId);
+            var item = items.Find(i => i.ToDoItemId == toDoItemId);
 
-            if (toDoItemById == null)
+            if (item == null)
             {
                 return NotFound();
             }
 
-            var dto = ToDoItemGetResponseDto.FromDomain(toDoItemById);
+            var dto = ToDoItemGetResponseDto.FromDomain(item);
             return Ok(dto);
         }
         catch (Exception ex)
@@ -71,7 +71,23 @@ public class ToDoItemsController : ControllerBase
     [HttpPut("{toDoItemId:int}")]
     public IActionResult UpdateById(int toDoItemId, [FromBody] ToDoItemUpdateRequestDto request)
     {
-        return Ok();
+        try
+        {
+            int index = items.FindIndex(i => i.ToDoItemId == toDoItemId);
+
+            if (index == -1)
+            {
+                return NotFound();
+            }
+
+            items[index] = request.ToDomain(items[index]);
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
+        }
     }
 
     [HttpDelete("{toDoItemId:int}")]
