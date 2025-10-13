@@ -52,14 +52,20 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            throw new Exception("Něco se opravdu nepovedlo.");
+            var toDoItemById = items.Find(i => i.ToDoItemId == toDoItemId);
+
+            if (toDoItemById == null)
+            {
+                return NotFound();
+            }
+
+            var dto = ToDoItemGetResponseDto.FromDomain(toDoItemById);
+            return Ok(dto);
         }
         catch (Exception ex)
         {
             return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);  //500
         }
-
-        return Ok();
     }
 
     [HttpPut("{toDoItemId:int}")]
