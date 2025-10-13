@@ -8,7 +8,7 @@ using ToDoList.Domain.Models;
 [ApiController]
 public class ToDoItemsController : ControllerBase
 {
-    private static List<ToDoItem> items = [];
+    private static readonly List<ToDoItem> Items = [];
 
     [HttpPost]
     public IActionResult Create(ToDoItemCreateRequestDto request) //použijeme DTO = Data Transfer Object
@@ -17,8 +17,8 @@ public class ToDoItemsController : ControllerBase
 
         try
         {
-            item.ToDoItemId = items.Count == 0 ? 1 : items.Max(o => o.ToDoItemId) + 1;
-            items.Add(item);
+            item.ToDoItemId = Items.Count == 0 ? 1 : Items.Max(o => o.ToDoItemId) + 1;
+            Items.Add(item);
         }
         catch (Exception ex)
         {
@@ -33,12 +33,12 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            if (items.Count == 0)
+            if (Items.Count == 0)
             {
                 return NotFound();
             }
 
-            var dtoList = items.Select(ToDoItemGetResponseDto.FromDomain).ToList();
+            var dtoList = Items.Select(ToDoItemGetResponseDto.FromDomain).ToList();
             return Ok(dtoList);
         }
         catch (Exception ex)
@@ -52,7 +52,7 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            var item = items.Find(i => i.ToDoItemId == toDoItemId);
+            var item = Items.Find(i => i.ToDoItemId == toDoItemId);
 
             if (item == null)
             {
@@ -73,14 +73,14 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            int index = items.FindIndex(i => i.ToDoItemId == toDoItemId);
+            int index = Items.FindIndex(i => i.ToDoItemId == toDoItemId);
 
             if (index == -1)
             {
                 return NotFound();
             }
 
-            items[index] = request.ToDomain(items[index]);
+            Items[index] = request.ToDomain(Items[index]);
 
             return NoContent();
         }
@@ -95,14 +95,14 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            int index = items.FindIndex(i => i.ToDoItemId == toDoItemId);
+            int index = Items.FindIndex(i => i.ToDoItemId == toDoItemId);
 
             if (index == -1)
             {
                 return NotFound();
             }
 
-            items.RemoveAt(index);
+            Items.RemoveAt(index);
 
             return NoContent();
         }
