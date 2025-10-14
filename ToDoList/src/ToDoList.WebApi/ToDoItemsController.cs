@@ -48,7 +48,7 @@ public class ToDoItemsController : ControllerBase
     }
 
     [HttpGet("{toDoItemId:int}")]
-    public IActionResult ReadById(int toDoItemId) //api/ToDoItems<id>
+    public IActionResult ReadById(int toDoItemId)
     {
         try
         {
@@ -64,7 +64,7 @@ public class ToDoItemsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);  //500
+            return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
         }
     }
 
