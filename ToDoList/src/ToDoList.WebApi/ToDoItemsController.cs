@@ -11,7 +11,7 @@ public class ToDoItemsController : ControllerBase
     private static readonly List<ToDoItem> Items = [];
 
     [HttpPost]
-    public IActionResult Create(ToDoItemCreateRequestDto request)
+    public ActionResult<ToDoItemGetResponseDto> Create(ToDoItemCreateRequestDto request)
     {
         var item = request.ToDomain();
 
@@ -25,11 +25,14 @@ public class ToDoItemsController : ControllerBase
             return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
         }
 
-        return CreatedAtAction(nameof(ReadById), new { item.ToDoItemId }, item);
+        return CreatedAtAction(
+            nameof(ReadById),
+            new { toDoItemId = item.ToDoItemId },
+            ToDoItemGetResponseDto.FromDomain(item));
     }
 
     [HttpGet]
-    public IActionResult Read()
+    public ActionResult<IEnumerable<ToDoItemGetResponseDto>> Read()
     {
         try
         {
@@ -48,7 +51,7 @@ public class ToDoItemsController : ControllerBase
     }
 
     [HttpGet("{toDoItemId:int}")]
-    public IActionResult ReadById(int toDoItemId)
+    public ActionResult<ToDoItemGetResponseDto> ReadById(int toDoItemId)
     {
         try
         {
@@ -110,5 +113,10 @@ public class ToDoItemsController : ControllerBase
         {
             return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
         }
+    }
+
+    public void AddItemToStorage(ToDoItem item)
+    {
+        Items.Add(item);
     }
 }
