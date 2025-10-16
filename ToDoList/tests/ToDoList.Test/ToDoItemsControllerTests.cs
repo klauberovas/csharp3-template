@@ -153,18 +153,37 @@ public class ToDoItemsControllerTests : IDisposable
     [Fact]
     public void DeleteById_ExistingItem_ReturnsNoContent()
     {
+        //Arrange
         AddSampleItem(1, "Jmeno1", "Popis1", true);
-        var deletedItem = _controller.DeleteById(1);
 
+        //Act
+        var deletedItem = _controller.DeleteById(1);
+        var actualListResult = _controller.Read();
+        var value = actualListResult.GetValue();
+
+        //Assert
         Assert.IsType<NoContentResult>(deletedItem);
+        Assert.Null(value);
     }
 
     [Fact]
     public void DeleteById_NoExistingItem_ReturnsNotFound()
     {
-        AddSampleItem(1, "Jmeno1", "Popis1", true);
-        var deletedItem = _controller.DeleteById(2);
+        //Arrange
+        var todoItem1 = AddSampleItem(1, "Jmeno1", "Popis1", true);
 
+        //Act
+        var deletedItem = _controller.DeleteById(2);
+        var actualListResult = _controller.Read();
+        var value = actualListResult.GetValue();
+
+        //Assert
         Assert.IsType<NotFoundResult>(deletedItem);
+
+        Assert.NotNull(value);
+        Assert.Single(value);
+
+        var item = value.Single();
+        Assert.Equal(todoItem1.ToDoItemId, item.Id);
     }
 }
