@@ -87,9 +87,8 @@ public class ToDoItemsControllerTests : IDisposable
         var result = _controller.Read();
         var value = result.GetValue();
 
-        var notFoundResult = Assert.IsType<NotFoundResult>(result.Result);
+        Assert.IsType<NotFoundResult>(result.Result);
         Assert.Null(value);
-        Assert.Equal(404, notFoundResult.StatusCode);
     }
 
     // ---------- READ BY ID ----------
@@ -115,8 +114,7 @@ public class ToDoItemsControllerTests : IDisposable
 
         Assert.Null(value);
 
-        var notFoundResult = Assert.IsType<NotFoundResult>(result.Result);
-        Assert.Equal(404, notFoundResult.StatusCode);
+        Assert.IsType<NotFoundResult>(result.Result);
     }
 
     // ---------- UPDATE ----------
@@ -131,8 +129,7 @@ public class ToDoItemsControllerTests : IDisposable
         var result = _controller.ReadById(1);
         var updatedValue = result.GetValue();
 
-        var noContentResult = Assert.IsType<NoContentResult>(updatedResult);
-        Assert.Equal(204, noContentResult.StatusCode);
+        Assert.IsType<NoContentResult>(updatedResult);
 
         Assert.NotNull(updatedValue);
         Assert.Equal(todoItem1.ToDoItemId, updatedValue.Id);
@@ -149,19 +146,25 @@ public class ToDoItemsControllerTests : IDisposable
 
         var updatedResult = _controller.UpdateById(2, request);
 
-        var notFoundResult = Assert.IsType<NotFoundResult>(updatedResult);
-        Assert.Equal(404, notFoundResult.StatusCode);
+        Assert.IsType<NotFoundResult>(updatedResult);
     }
 
-    // // -------- DELETE -------
-    // [Fact]
-    // public void DeleteById_ExistingItem_ReturnsNoContent()
-    // {
+    // -------- DELETE -------
+    [Fact]
+    public void DeleteById_ExistingItem_ReturnsNoContent()
+    {
+        AddSampleItem(1, "Jmeno1", "Popis1", true);
+        var deletedItem = _controller.DeleteById(1);
 
-    // }
-    // [Fact]
-    // public void DeletById_NoExistingItem_ReturnsNotFound()
-    // {
+        Assert.IsType<NoContentResult>(deletedItem);
+    }
 
-    // }
+    [Fact]
+    public void DeleteById_NoExistingItem_ReturnsNotFound()
+    {
+        AddSampleItem(1, "Jmeno1", "Popis1", true);
+        var deletedItem = _controller.DeleteById(2);
+
+        Assert.IsType<NotFoundResult>(deletedItem);
+    }
 }
