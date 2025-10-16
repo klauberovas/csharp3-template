@@ -1,22 +1,37 @@
 namespace ToDoList.Test;
 
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
 using ToDoList.Domain.Models;
 using ToDoList.WebApi;
 
-public class ToDoItemsControllerTests
+public class ToDoItemsControllerTests : IDisposable
 {
+    private readonly ToDoItemsController _controller;
+
+    public ToDoItemsControllerTests()
+    {
+        _controller = new ToDoItemsController();
+    }
+
+    public void Dispose()
+    {
+        // Clear the static list after each test
+        var field = typeof(ToDoItemsController).GetField("Items", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        var items = (List<ToDoItem>)field!.GetValue(null)!;
+        items.Clear();
+    }
+
     // ------- CREATE ------
     [Fact]
     public void Create_ValidRequest_ReturnsCreatedItems()
     {
         //Arrange
         var request = new ToDoItemCreateRequestDto("Jmeno1", "Popis1", false);
-        var controller = new ToDoItemsController();
 
         //Act
-        var result = controller.Create(request);
+        var result = _controller.Create(request);
 
         //Assert
         var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
@@ -49,12 +64,11 @@ public class ToDoItemsControllerTests
             IsCompleted = true
         };
 
-        var controller = new ToDoItemsController();
-        controller.AddItemToStorage(todoItem1);
-        controller.AddItemToStorage(todoItem2);
+        _controller.AddItemToStorage(todoItem1);
+        _controller.AddItemToStorage(todoItem2);
 
         // Act
-        var result = controller.Read();
+        var result = _controller.Read();
         var value = result.GetValue();
 
         // Assert
@@ -76,8 +90,7 @@ public class ToDoItemsControllerTests
     [Fact]
     public void Read_NoItems_ReturnsNotFound()
     {
-        var controller = new ToDoItemsController();
-        var result = controller.Read();
+        var result = _controller.Read();
         var value = result.GetValue();
 
         var notFoundResult = Assert.IsType<NotFoundResult>(result.Result);
@@ -98,11 +111,10 @@ public class ToDoItemsControllerTests
             IsCompleted = false
         };
 
-        var controller = new ToDoItemsController();
-        controller.AddItemToStorage(todoItem1);
+        _controller.AddItemToStorage(todoItem1);
 
         //Act
-        var result = controller.ReadById(1);
+        var result = _controller.ReadById(1);
         var value = result.GetValue();
 
         //Assert
