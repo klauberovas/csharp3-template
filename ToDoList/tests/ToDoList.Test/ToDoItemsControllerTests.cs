@@ -124,11 +124,20 @@ public class ToDoItemsControllerTests : IDisposable
         Assert.Equal(value.IsCompleted, todoItem1.IsCompleted);
     }
 
-    // [Fact]
-    // public void ReadById_NonExistingItem_ReturnsNotFound()
-    // {
+    [Fact]
+    public void ReadById_NonExistingItem_ReturnsNotFound()
+    {
+        //Act: call ReadById method with a non-existing ID
+        var result = _controller.ReadById(2);
+        var value = result.GetValue();
 
-    // }
+        //Assert: check  that no data is returned
+        Assert.Null(value);
+
+        //Assert: check the response type is NotFoundResult with status code 404
+        var notFoundResult = Assert.IsType<NotFoundResult>(result.Result);
+        Assert.Equal(404, notFoundResult.StatusCode);
+    }
 
     // // ---------- UPDATE ----------
     // [Fact]
