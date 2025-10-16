@@ -1,29 +1,32 @@
 namespace ToDoList.Test;
 
 using Microsoft.AspNetCore.Mvc;
+using ToDoList.Domain.DTOs;
 using ToDoList.Domain.Models;
 using ToDoList.WebApi;
 
 public class ToDoItemsControllerTests
 {
-    private readonly ToDoItemsController _controller;
-
-    public ToDoItemsControllerTests()
-    {
-        _controller = new ToDoItemsController();
-    }
-
     // ------- CREATE ------
     [Fact]
     public void Create_ValidRequest_ReturnsCreatedItems()
     {
+        //Arrange
+        var request = new ToDoItemCreateRequestDto("Jmeno1", "Popis1", false);
+        var controller = new ToDoItemsController();
 
-    }
+        //Act
+        var result = controller.Create(request);
 
-    [Fact]
-    public void Create_ExceptionThrown_ReturnsProblemResult()
-    {
+        //Assert
+        var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
+        Assert.Equal(201, createdResult.StatusCode);
 
+        var createdDto = Assert.IsType<ToDoItemGetResponseDto>(createdResult.Value);
+        Assert.Equal(request.Name, createdDto.Name);
+        Assert.Equal(request.Description, createdDto.Description);
+        Assert.Equal(request.IsCompleted, createdDto.IsCompleted);
+        Assert.True(createdDto.Id > 0);
     }
 
     // ------- READ ALL ------
@@ -46,11 +49,12 @@ public class ToDoItemsControllerTests
             IsCompleted = true
         };
 
-        _controller.AddItemToStorage(todoItem1);
-        _controller.AddItemToStorage(todoItem2);
+        var controller = new ToDoItemsController();
+        controller.AddItemToStorage(todoItem1);
+        controller.AddItemToStorage(todoItem2);
 
         // Act
-        var result = _controller.Read();
+        var result = controller.Read();
         var value = result.GetValue();
 
         // Assert
@@ -72,60 +76,49 @@ public class ToDoItemsControllerTests
     [Fact]
     public void Read_NoItems_ReturnsNotFound()
     {
-        var result = _controller.Read();
+        var controller = new ToDoItemsController();
+        var result = controller.Read();
         var value = result.GetValue();
-        var notFoundResult = Assert.IsType<NotFoundResult>(result.Result);
 
+        var notFoundResult = Assert.IsType<NotFoundResult>(result.Result);
         Assert.Null(value);
         Assert.Equal(404, notFoundResult.StatusCode);
     }
 
-    // ---------- READ BY ID ----------
-    [Fact]
-    public void ReadById_ExistingItem_ReturnsItem()
-    {
+    // // ---------- READ BY ID ----------
+    // [Fact]
+    // public void ReadById_ExistingItem_ReturnsItem()
+    // {
 
-    }
+    // }
 
-    [Fact]
-    public void ReadById_NonExistingItem_ReturnsNotFound()
-    {
+    // [Fact]
+    // public void ReadById_NonExistingItem_ReturnsNotFound()
+    // {
 
-    }
+    // }
 
-    // ---------- UPDATE ----------
-    [Fact]
-    public void UpdateById_ExistingItem_ReturnsNoContent()
-    {
+    // // ---------- UPDATE ----------
+    // [Fact]
+    // public void UpdateById_ExistingItem_ReturnsNoContent()
+    // {
 
-    }
-    [Fact]
-    public void UpdateById_NoExistingItem_ReturnsNotFound()
-    {
+    // }
+    // [Fact]
+    // public void UpdateById_NoExistingItem_ReturnsNotFound()
+    // {
 
-    }
+    // }
 
-    [Fact]
-    public void UpdateById_ExceptionThrown_ReturnsProblem()
-    {
+    // // -------- DELETE -------
+    // [Fact]
+    // public void DeleteById_ExistingItem_ReturnsNoContent()
+    // {
 
-    }
+    // }
+    // [Fact]
+    // public void DeletById_NoExistingItem_ReturnsNotFound()
+    // {
 
-    // -------- DELETE -------
-    [Fact]
-    public void DeleteById_ExistingItem_ReturnsNoContent()
-    {
-
-    }
-    [Fact]
-    public void DeletById_NoExistingItem_ReturnsNotFound()
-    {
-
-    }
-
-    [Fact]
-    public void DeleteById_ExceptionThrown_ReturnsProblem()
-    {
-
-    }
+    // }
 }
