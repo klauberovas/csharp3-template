@@ -17,23 +17,32 @@ public class ToDoItemsControllerTests : IDisposable
 
     public void Dispose()
     {
-        // Clear the static list after each test
         var field = typeof(ToDoItemsController).GetField("Items", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
         var items = (List<ToDoItem>)field!.GetValue(null)!;
         items.Clear();
+    }
+
+    private ToDoItem AddSampleItem(int id, string name, string description, bool isCompleted)
+    {
+        var item = new ToDoItem
+        {
+            ToDoItemId = id,
+            Name = name,
+            Description = description,
+            IsCompleted = isCompleted
+        };
+        _controller.AddItemToStorage(item);
+        return item;
     }
 
     // ------- CREATE ------
     [Fact]
     public void Create_ValidRequest_ReturnsCreatedItems()
     {
-        //Arrange
         var request = new ToDoItemCreateRequestDto("Jmeno1", "Popis1", false);
 
-        //Act
         var result = _controller.Create(request);
 
-        //Assert
         var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
         Assert.Equal(201, createdResult.StatusCode);
 
@@ -49,23 +58,8 @@ public class ToDoItemsControllerTests : IDisposable
     public void Read_ItemsExist_ReturnsAllItems()
     {
         // Arrange
-        var todoItem1 = new ToDoItem
-        {
-            ToDoItemId = 1,
-            Name = "Jmeno1",
-            Description = "Popis1",
-            IsCompleted = false
-        };
-        var todoItem2 = new ToDoItem
-        {
-            ToDoItemId = 2,
-            Name = "Jmeno2",
-            Description = "Popis2",
-            IsCompleted = true
-        };
-
-        _controller.AddItemToStorage(todoItem1);
-        _controller.AddItemToStorage(todoItem2);
+        var todoItem1 = AddSampleItem(1, "Jmeno1", "Popis1", false);
+        var todoItem2 = AddSampleItem(2, "Jmeno2", "Popis2", false);
 
         // Act
         var result = _controller.Read();
@@ -102,22 +96,11 @@ public class ToDoItemsControllerTests : IDisposable
     [Fact]
     public void ReadById_ExistingItem_ReturnsItem()
     {
-        //Arrange
-        var todoItem1 = new ToDoItem
-        {
-            ToDoItemId = 1,
-            Name = "Jmeno1",
-            Description = "Popis1",
-            IsCompleted = false
-        };
+        var todoItem1 = AddSampleItem(1, "Jmeno1", "Popis1", false);
 
-        _controller.AddItemToStorage(todoItem1);
-
-        //Act
         var result = _controller.ReadById(1);
         var value = result.GetValue();
 
-        //Assert
         Assert.NotNull(value);
         Assert.Equal(value.Id, todoItem1.ToDoItemId);
         Assert.Equal(value.Description, todoItem1.Description);
@@ -127,29 +110,48 @@ public class ToDoItemsControllerTests : IDisposable
     [Fact]
     public void ReadById_NonExistingItem_ReturnsNotFound()
     {
-        //Act: call ReadById method with a non-existing ID
         var result = _controller.ReadById(2);
         var value = result.GetValue();
 
-        //Assert: check  that no data is returned
         Assert.Null(value);
 
-        //Assert: check the response type is NotFoundResult with status code 404
         var notFoundResult = Assert.IsType<NotFoundResult>(result.Result);
         Assert.Equal(404, notFoundResult.StatusCode);
     }
 
-    // // ---------- UPDATE ----------
-    // [Fact]
-    // public void UpdateById_ExistingItem_ReturnsNoContent()
-    // {
+    // ---------- UPDATE ----------
+    [Fact]
+    public void UpdateById_ExistingItem_ReturnsNoContent()
+    {
+        var todoItem1 = AddSampleItem(1, "Jmeno1", "Popis1", false);
 
-    // }
-    // [Fact]
-    // public void UpdateById_NoExistingItem_ReturnsNotFound()
-    // {
+        var request = new ToDoItemUpdateRequestDto("UpdateName", "UpdateDescription", true);
 
-    // }
+        var updatedResult = _controller.UpdateById(1, request);
+        var result = _controller.ReadById(1);
+        var updatedValue = result.GetValue();
+
+        var noContentResult = Assert.IsType<NoContentResult>(updatedResult);
+        Assert.Equal(204, noContentResult.StatusCode);
+
+        Assert.NotNull(updatedValue);
+        Assert.Equal(todoItem1.ToDoItemId, updatedValue.Id);
+        Assert.Equal(request.Name, updatedValue.Name);
+        Assert.Equal(request.Description, updatedValue.Description);
+        Assert.True(updatedValue.IsCompleted);
+    }
+
+    [Fact]
+    public void UpdateById_NoExistingItem_ReturnsNotFound()
+    {
+        AddSampleItem(1, "Jmeno1", "Popis1", false);
+        var request = new ToDoItemUpdateRequestDto("UpdatedName", "UpdatedDescription", false);
+
+        var updatedResult = _controller.UpdateById(2, request);
+
+        var notFoundResult = Assert.IsType<NotFoundResult>(updatedResult);
+        Assert.Equal(404, notFoundResult.StatusCode);
+    }
 
     // // -------- DELETE -------
     // [Fact]
