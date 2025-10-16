@@ -85,12 +85,32 @@ public class ToDoItemsControllerTests
         Assert.Equal(404, notFoundResult.StatusCode);
     }
 
-    // // ---------- READ BY ID ----------
-    // [Fact]
-    // public void ReadById_ExistingItem_ReturnsItem()
-    // {
+    // ---------- READ BY ID ----------
+    [Fact]
+    public void ReadById_ExistingItem_ReturnsItem()
+    {
+        //Arrange
+        var todoItem1 = new ToDoItem
+        {
+            ToDoItemId = 1,
+            Name = "Jmeno1",
+            Description = "Popis1",
+            IsCompleted = false
+        };
 
-    // }
+        var controller = new ToDoItemsController();
+        controller.AddItemToStorage(todoItem1);
+
+        //Act
+        var result = controller.ReadById(1);
+        var value = result.GetValue();
+
+        //Assert
+        Assert.NotNull(value);
+        Assert.Equal(value.Id, todoItem1.ToDoItemId);
+        Assert.Equal(value.Description, todoItem1.Description);
+        Assert.Equal(value.IsCompleted, todoItem1.IsCompleted);
+    }
 
     // [Fact]
     // public void ReadById_NonExistingItem_ReturnsNotFound()
