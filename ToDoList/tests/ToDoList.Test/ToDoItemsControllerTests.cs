@@ -1,10 +1,18 @@
 namespace ToDoList.Test;
 
+using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.Models;
 using ToDoList.WebApi;
 
 public class ToDoItemsControllerTests
 {
+    private readonly ToDoItemsController _controller;
+
+    public ToDoItemsControllerTests()
+    {
+        _controller = new ToDoItemsController();
+    }
+
     // ------- CREATE ------
     [Fact]
     public void Create_ValidRequest_ReturnsCreatedItems()
@@ -13,14 +21,14 @@ public class ToDoItemsControllerTests
     }
 
     [Fact]
-    public void Create_ExceptionThrown_ReturnProblemResult()
+    public void Create_ExceptionThrown_ReturnsProblemResult()
     {
 
     }
 
     // ------- READ ALL ------
     [Fact]
-    public void Read_ItemsExist_ReturnAllItems()
+    public void Read_ItemsExist_ReturnsAllItems()
     {
         // Arrange
         var todoItem1 = new ToDoItem
@@ -38,12 +46,11 @@ public class ToDoItemsControllerTests
             IsCompleted = true
         };
 
-        var controller = new ToDoItemsController();
-        controller.AddItemToStorage(todoItem1);
-        controller.AddItemToStorage(todoItem2);
+        _controller.AddItemToStorage(todoItem1);
+        _controller.AddItemToStorage(todoItem2);
 
         // Act
-        var result = controller.Read();
+        var result = _controller.Read();
         var value = result.GetValue();
 
         // Assert
@@ -65,7 +72,12 @@ public class ToDoItemsControllerTests
     [Fact]
     public void Read_NoItems_ReturnsNotFound()
     {
+        var result = _controller.Read();
+        var value = result.GetValue();
+        var notFoundResult = Assert.IsType<NotFoundResult>(result.Result);
 
+        Assert.Null(value);
+        Assert.Equal(404, notFoundResult.StatusCode);
     }
 
     // ---------- READ BY ID ----------
