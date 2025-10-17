@@ -35,15 +35,23 @@ public class ToDoItemsControllerTests : IDisposable
         return item;
     }
 
+    private static void AssertEqualItems(ToDoItem expected, ToDoItemGetResponseDto actual)
+    {
+        Assert.Equal(expected.ToDoItemId, actual.Id);
+        Assert.Equal(expected.Name, actual.Name);
+        Assert.Equal(expected.Description, actual.Description);
+        Assert.Equal(expected.IsCompleted, actual.IsCompleted);
+    }
+
     // ------- CREATE ------
     [Fact]
-    public void Create_ValidRequest_ReturnsCreatedItems()
+    public void Create_ValidRequest_ReturnsCreatedItem()
     {
-        var request = new ToDoItemCreateRequestDto("Jmeno1", "Popis1", false);
+        var request = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
 
-        var result = _controller.Create(request);
+        var actionResult = _controller.Create(request);
 
-        var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
+        var createdResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
         Assert.Equal(201, createdResult.StatusCode);
 
         var createdDto = Assert.IsType<ToDoItemGetResponseDto>(createdResult.Value);
@@ -53,100 +61,116 @@ public class ToDoItemsControllerTests : IDisposable
         Assert.True(createdDto.Id > 0);
     }
 
+    [Fact]
+    public void Create_MultipleItems_AssignsIncrementalIds()
+    {
+        var request1 = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
+        var request2 = new ToDoItemCreateRequestDto("Task2", "Desc2", false);
+
+        var actionResult1 = _controller.Create(request1);
+        var actionResult2 = _controller.Create(request2);
+
+        var dto1 = (actionResult1.Result as CreatedAtActionResult)?.Value as ToDoItemGetResponseDto;
+        var dto2 = (actionResult2.Result as CreatedAtActionResult)?.Value as ToDoItemGetResponseDto;
+
+        Assert.Equal(dto1.Id + 1, dto2.Id);
+    }
+
     // ------- READ ALL ------
     [Fact]
     public void Read_ItemsExist_ReturnsAllItems()
     {
         // Arrange
-        var todoItem1 = AddSampleItem(1, "Jmeno1", "Popis1", false);
-        var todoItem2 = AddSampleItem(2, "Jmeno2", "Popis2", false);
+        var todoItem1 = AddSampleItem(1, "Task1", "Desc1", false);
+        var todoItem2 = AddSampleItem(2, "Task2", "Desc2", false);
 
         // Act
-        var result = _controller.Read();
-        var value = result.GetValue();
+        var actionResult = _controller.Read();
+        var resultValue = actionResult.GetValue();
 
         // Assert
-        Assert.NotNull(value);
+        Assert.NotNull(resultValue);
 
-        var firstToDo = value.First();
-        Assert.Equal(todoItem1.ToDoItemId, firstToDo.Id);
-        Assert.Equal(todoItem1.Name, firstToDo.Name);
-        Assert.Equal(todoItem1.Description, firstToDo.Description);
-        Assert.Equal(todoItem1.IsCompleted, firstToDo.IsCompleted);
-
-        var secondToDo = value.Last();
-        Assert.Equal(todoItem2.ToDoItemId, secondToDo.Id);
-        Assert.Equal(todoItem2.Name, secondToDo.Name);
-        Assert.Equal(todoItem2.Description, secondToDo.Description);
-        Assert.Equal(todoItem2.IsCompleted, secondToDo.IsCompleted);
+        AssertEqualItems(todoItem1, resultValue.First());
+        AssertEqualItems(todoItem2, resultValue.Last());
     }
 
     [Fact]
     public void Read_NoItems_ReturnsNotFound()
     {
-        var result = _controller.Read();
-        var value = result.GetValue();
+        var actionResult = _controller.Read();
+        var resultValue = actionResult.GetValue();
 
-        Assert.IsType<NotFoundResult>(result.Result);
-        Assert.Null(value);
+        Assert.IsType<NotFoundResult>(actionResult.Result);
+        Assert.Null(resultValue);
     }
 
     // ---------- READ BY ID ----------
     [Fact]
     public void ReadById_ExistingItem_ReturnsItem()
     {
-        var todoItem1 = AddSampleItem(1, "Jmeno1", "Popis1", false);
+        var todoItem = AddSampleItem(1, "Task1", "Desc1", false);
 
-        var result = _controller.ReadById(1);
-        var value = result.GetValue();
+        var actionResult = _controller.ReadById(1);
+        var resultValue = actionResult.GetValue();
 
-        Assert.NotNull(value);
-        Assert.Equal(value.Id, todoItem1.ToDoItemId);
-        Assert.Equal(value.Description, todoItem1.Description);
-        Assert.Equal(value.IsCompleted, todoItem1.IsCompleted);
+        Assert.NotNull(resultValue);
+        AssertEqualItems(todoItem, resultValue);
     }
 
     [Fact]
     public void ReadById_NonExistingItem_ReturnsNotFound()
     {
-        var result = _controller.ReadById(2);
-        var value = result.GetValue();
+        var actionResult = _controller.ReadById(2);
+        var resultValue = actionResult.GetValue();
 
-        Assert.Null(value);
+        Assert.Null(resultValue);
 
-        Assert.IsType<NotFoundResult>(result.Result);
+        Assert.IsType<NotFoundResult>(actionResult.Result);
     }
 
     // ---------- UPDATE ----------
     [Fact]
     public void UpdateById_ExistingItem_ReturnsNoContent()
     {
-        var todoItem1 = AddSampleItem(1, "Jmeno1", "Popis1", false);
+        var originaltem = AddSampleItem(1, "Task1", "Desc1", false);
+        var request = new ToDoItemUpdateRequestDto("UpdateTask", "UpdateDesc", true);
 
-        var request = new ToDoItemUpdateRequestDto("UpdateName", "UpdateDescription", true);
+        var updateResult = _controller.UpdateById(1, request);
+        var readResult = _controller.ReadById(1);
+        var resultValue = readResult.GetValue();
 
-        var updatedResult = _controller.UpdateById(1, request);
-        var result = _controller.ReadById(1);
-        var updatedValue = result.GetValue();
+        Assert.IsType<NoContentResult>(updateResult);
 
-        Assert.IsType<NoContentResult>(updatedResult);
-
-        Assert.NotNull(updatedValue);
-        Assert.Equal(todoItem1.ToDoItemId, updatedValue.Id);
-        Assert.Equal(request.Name, updatedValue.Name);
-        Assert.Equal(request.Description, updatedValue.Description);
-        Assert.True(updatedValue.IsCompleted);
+        Assert.NotNull(resultValue);
+        Assert.Equal(originaltem.ToDoItemId, resultValue.Id);
+        Assert.Equal(request.Name, resultValue.Name);
+        Assert.Equal(request.Description, resultValue.Description);
+        Assert.True(resultValue.IsCompleted);
     }
 
     [Fact]
-    public void UpdateById_NoExistingItem_ReturnsNotFound()
+    public void UpdateById_NonExistingItem_ReturnsNotFound()
     {
-        AddSampleItem(1, "Jmeno1", "Popis1", false);
-        var request = new ToDoItemUpdateRequestDto("UpdatedName", "UpdatedDescription", false);
+        AddSampleItem(1, "Task1", "Desc1", false);
+        var request = new ToDoItemUpdateRequestDto("UpdatedTask", "UpdatedDesc", false);
 
-        var updatedResult = _controller.UpdateById(2, request);
+        var updateResult = _controller.UpdateById(2, request);
 
-        Assert.IsType<NotFoundResult>(updatedResult);
+        Assert.IsType<NotFoundResult>(updateResult);
+    }
+
+    [Fact]
+    public void UpdateById_ExistingItem_DoesNotChange()
+    {
+        var originaltem = AddSampleItem(1, "Task1", "Desc1", false);
+        var request = new ToDoItemUpdateRequestDto("UpdateTask", "UpdateDesc", true);
+
+        _controller.UpdateById(1, request);
+        var readResult = _controller.ReadById(1);
+        var resultValue = readResult.GetValue();
+
+        Assert.Equal(originaltem.ToDoItemId, resultValue.Id);
     }
 
     // -------- DELETE -------
@@ -154,36 +178,47 @@ public class ToDoItemsControllerTests : IDisposable
     public void DeleteById_ExistingItem_ReturnsNoContent()
     {
         //Arrange
-        AddSampleItem(1, "Jmeno1", "Popis1", true);
+        AddSampleItem(1, "Task1", "Desc1", true);
 
         //Act
-        var deletedItem = _controller.DeleteById(1);
-        var actualListResult = _controller.Read();
-        var value = actualListResult.GetValue();
+        var deleteItem = _controller.DeleteById(1);
+        var readResult = _controller.Read();
+        var resultValue = readResult.GetValue();
 
         //Assert
-        Assert.IsType<NoContentResult>(deletedItem);
-        Assert.Null(value);
+        Assert.IsType<NoContentResult>(deleteItem);
+        Assert.Null(resultValue);
     }
 
     [Fact]
-    public void DeleteById_NoExistingItem_ReturnsNotFound()
+    public void DeleteById_ExistingItem_RemovesOnlyTarget()
     {
-        //Arrange
-        var todoItem1 = AddSampleItem(1, "Jmeno1", "Popis1", true);
+        AddSampleItem(1, "Task1", "Desc1", false);
+        AddSampleItem(2, "Task2", "Desc2", false);
 
-        //Act
-        var deletedItem = _controller.DeleteById(2);
-        var actualListResult = _controller.Read();
-        var value = actualListResult.GetValue();
+        _controller.DeleteById(1);
 
-        //Assert
-        Assert.IsType<NotFoundResult>(deletedItem);
+        var readResult = _controller.Read();
+        var resultValue = readResult.GetValue();
 
-        Assert.NotNull(value);
-        Assert.Single(value);
+        Assert.Single(resultValue);
+        Assert.Equal(2, resultValue.Single().Id);
+    }
 
-        var item = value.Single();
-        Assert.Equal(todoItem1.ToDoItemId, item.Id);
+    [Fact]
+    public void DeleteById_NonExistingItem_ReturnsNotFound()
+    {
+        var existingItem = AddSampleItem(1, "Task1", "Desc1", true);
+
+        var deleteItem = _controller.DeleteById(2);
+        var readResult = _controller.Read();
+        var resultValue = readResult.GetValue();
+
+        Assert.IsType<NotFoundResult>(deleteItem);
+        Assert.NotNull(resultValue);
+        Assert.Single(resultValue);
+
+        var item = resultValue.Single();
+        Assert.Equal(existingItem.ToDoItemId, item.Id);
     }
 }
