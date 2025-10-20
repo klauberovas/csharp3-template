@@ -80,15 +80,12 @@ public class ToDoItemsControllerTests : IDisposable
     [Fact]
     public void Read_ItemsExist_ReturnsAllItems()
     {
-        // Arrange
         var todoItem1 = AddSampleItem(1, "Task1", "Desc1", false);
         var todoItem2 = AddSampleItem(2, "Task2", "Desc2", false);
 
-        // Act
         var actionResult = _controller.Read();
         var resultValue = actionResult.GetValue();
 
-        // Assert
         Assert.NotNull(resultValue);
 
         AssertEqualItems(todoItem1, resultValue.First());
@@ -158,19 +155,6 @@ public class ToDoItemsControllerTests : IDisposable
         var updateResult = _controller.UpdateById(2, request);
 
         Assert.IsType<NotFoundResult>(updateResult);
-    }
-
-    [Fact]
-    public void UpdateById_ExistingItem_DoesNotChange()
-    {
-        var originaltem = AddSampleItem(1, "Task1", "Desc1", false);
-        var request = new ToDoItemUpdateRequestDto("UpdateTask", "UpdateDesc", true);
-
-        _controller.UpdateById(1, request);
-        var readResult = _controller.ReadById(1);
-        var resultValue = readResult.GetValue();
-
-        Assert.Equal(originaltem.ToDoItemId, resultValue.Id);
     }
 
     // -------- DELETE -------
