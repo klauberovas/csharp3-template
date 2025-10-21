@@ -10,9 +10,9 @@ public class ToDoItemsControllerTests : IDisposable
 {
     private readonly ToDoItemsController _controller;
 
-    public ToDoItemsControllerTests()
+    public ToDoItemsControllerTests(ToDoItemsController _controller)
     {
-        _controller = new ToDoItemsController();
+        this._controller = _controller;
     }
 
     public void Dispose()
