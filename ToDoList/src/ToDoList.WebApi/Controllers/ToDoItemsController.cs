@@ -9,7 +9,6 @@ using ToDoList.Persistence;
 [ApiController]
 public class ToDoItemsController : ControllerBase
 {
-    private static readonly List<ToDoItem> Items = []; // smazat po úkolu
     private readonly ToDoItemsContext context;
 
     public ToDoItemsController(ToDoItemsContext context)
@@ -43,12 +42,15 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            if (Items.Count == 0)
+            if (!context.ToDoItems.Any())
             {
                 return NotFound();
             }
 
-            var dtoList = Items.Select(ToDoItemGetResponseDto.FromDomain).ToList();
+            var dtoList = context.ToDoItems
+            .Select(ToDoItemGetResponseDto.FromDomain)
+            .ToList();
+
             return Ok(dtoList);
         }
         catch (Exception ex)
@@ -62,7 +64,7 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            var item = Items.Find(i => i.ToDoItemId == toDoItemId);
+            var item = context.ToDoItems.Find(toDoItemId);
 
             if (item == null)
             {
@@ -83,14 +85,15 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            int index = Items.FindIndex(i => i.ToDoItemId == toDoItemId);
+            var item = context.ToDoItems.Find(toDoItemId);
 
-            if (index == -1)
+            if (item == null)
             {
                 return NotFound();
             }
 
-            Items[index] = request.ToDomain(Items[index]);
+            request.ApplyToDomain(item);
+            context.SaveChanges();
 
             return NoContent();
         }
@@ -105,14 +108,15 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            int index = Items.FindIndex(i => i.ToDoItemId == toDoItemId);
+            var item = context.ToDoItems.Find(toDoItemId);
 
-            if (index == -1)
+            if (item == null)
             {
                 return NotFound();
             }
 
-            Items.RemoveAt(index);
+            context.Remove(item);
+            context.SaveChanges();
 
             return NoContent();
         }
@@ -120,10 +124,5 @@ public class ToDoItemsController : ControllerBase
         {
             return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
         }
-    }
-
-    public void AddItemToStorage(ToDoItem item)
-    {
-        Items.Add(item);
     }
 }
