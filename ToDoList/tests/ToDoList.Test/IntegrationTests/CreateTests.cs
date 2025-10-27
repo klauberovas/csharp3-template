@@ -5,23 +5,8 @@ using ToDoList.Domain.DTOs;
 using ToDoList.Persistence;
 using ToDoList.WebApi;
 
-public class CreateTests : IDisposable
+public class CreateTests : ControllerTestBase
 {
-    protected readonly ToDoItemsController Controller;
-    protected readonly ToDoItemsContext Context;
-    public CreateTests()
-    {
-        Context = new ToDoItemsContext("Data Source=../../../IntegrationTests/data/localdb_test.db");
-        Controller = new ToDoItemsController(Context);
-    }
-
-    public void Dispose()
-    {
-        Context.ToDoItems.RemoveRange(Context.ToDoItems.ToList());
-        Context.SaveChanges();
-        Context.Dispose();
-    }
-
     [Fact]
     public void Create_ValidRequest_ReturnsCreatedItem()
     {

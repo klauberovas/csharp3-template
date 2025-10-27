@@ -2,25 +2,9 @@ namespace ToDoList.Test.IntegrationTests;
 
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
-using ToDoList.Persistence;
-using ToDoList.WebApi;
 
-public class ReadTests : IDisposable
+public class ReadTests : ControllerTestBase
 {
-    protected readonly ToDoItemsController Controller;
-    protected readonly ToDoItemsContext Context;
-    public ReadTests()
-    {
-        Context = new ToDoItemsContext("Data Source=../../../IntegrationTests/data/localdb_test.db");
-        Controller = new ToDoItemsController(Context);
-    }
-
-    public void Dispose()
-    {
-        Context.ToDoItems.RemoveRange(Context.ToDoItems.ToList());
-        Context.SaveChanges();
-        Context.Dispose();
-    }
 
     [Fact]
     public void Read_ItemsExist_ReturnsAllItems()
