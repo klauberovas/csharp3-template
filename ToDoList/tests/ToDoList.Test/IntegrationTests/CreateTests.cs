@@ -3,7 +3,7 @@ namespace ToDoList.Test.IntegrationTests;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
 
-public class CreateTests : ControllerTestBase
+public class CreateTests : ControllerIntegrationTestBase
 {
     [Fact]
     public void Create_ValidRequest_ReturnsCreatedItem()

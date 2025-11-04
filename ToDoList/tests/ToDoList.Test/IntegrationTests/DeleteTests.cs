@@ -3,7 +3,7 @@ namespace ToDoList.Test.IntegrationTests;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
 
-public class DeleteTests : ControllerTestBase
+public class DeleteTests : ControllerIntegrationTestBase
 {
     [Fact]
     public void DeleteById_ExistingItem_ReturnsNoContent()

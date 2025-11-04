@@ -3,7 +3,7 @@ namespace ToDoList.Test.IntegrationTests;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
 
-public class ReadByIdTests : ControllerTestBase
+public class ReadByIdTests : ControllerIntegrationTestBase
 {
     [Fact]
     public void ReadById_ExistingItem_ReturnsItem()

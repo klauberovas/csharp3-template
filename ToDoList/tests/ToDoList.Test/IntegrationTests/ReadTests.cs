@@ -3,7 +3,7 @@ namespace ToDoList.Test.IntegrationTests;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
 
-public class ReadTests : ControllerTestBase
+public class ReadTests : ControllerIntegrationTestBase
 {
 
     [Fact]
