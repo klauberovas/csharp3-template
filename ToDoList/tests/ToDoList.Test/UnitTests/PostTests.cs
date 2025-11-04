@@ -1,12 +1,12 @@
-namespace ToDoList.Test.IntegrationTests;
+namespace ToDoList.Test.UnitTests;
 
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
 
-public class CreateTests : ControllerTestBase
+public class PostTests : ControllerUnitTestBase
 {
     [Fact]
-    public void Create_ValidRequest_ReturnsCreatedItem()
+    public void Post_ValidRequest_ReturnsCreatedItem()
     {
         //Arrange
         var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
