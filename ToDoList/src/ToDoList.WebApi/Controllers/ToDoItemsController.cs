@@ -44,12 +44,13 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            if (!context.ToDoItems.Any())
+            var items = repository.Read();
+            if (!items.Any())
             {
                 return NotFound();
             }
 
-            var dtoList = context.ToDoItems
+            var dtoList = items
             .Select(ToDoItemGetResponseDto.FromDomain)
             .ToList();
 
@@ -66,7 +67,7 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            var item = context.ToDoItems.Find(toDoItemId);
+            var item = repository.ReadById(toDoItemId);
 
             if (item == null)
             {
@@ -87,7 +88,7 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            var item = context.ToDoItems.Find(toDoItemId);
+            var item = repository.ReadById(toDoItemId);
 
             if (item == null)
             {
@@ -95,7 +96,6 @@ public class ToDoItemsController : ControllerBase
             }
 
             request.ApplyToDomain(item);
-            context.SaveChanges();
 
             return NoContent();
         }
@@ -110,15 +110,14 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            var item = context.ToDoItems.Find(toDoItemId);
+            var item = repository.ReadById(toDoItemId);
 
             if (item == null)
             {
                 return NotFound();
             }
 
-            context.Remove(item);
-            context.SaveChanges();
+            repository.Delete(item);
 
             return NoContent();
         }
