@@ -7,10 +7,11 @@ using ToDoList.WebApi;
 public class ControllerUnitTestBase
 {
     protected readonly ToDoItemsController Controller;
+    protected readonly IRepository<ToDoItem> RepositoryMock;
 
     public ControllerUnitTestBase()
     {
-        var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
-        Controller = new ToDoItemsController(repositoryMock);
+        RepositoryMock = Substitute.For<IRepository<ToDoItem>>();
+        Controller = new ToDoItemsController(RepositoryMock);
     }
 }
