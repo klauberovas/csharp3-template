@@ -3,11 +3,11 @@ namespace ToDoList.Test.IntegrationTests;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
 
-public class UpdateTests : ControllerIntegrationTestBase
+public class PutTests : ControllerIntegrationTestBase
 {
 
     [Fact]
-    public void UpdateById_ExistingItem_ReturnsNoContent()
+    public void Put_ExistingItem_ReturnsNoContent()
     {
         //Arrange
         var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
@@ -31,7 +31,7 @@ public class UpdateTests : ControllerIntegrationTestBase
     }
 
     [Fact]
-    public void UpdateById_NonExistingItem_ReturnsNotFound()
+    public void Put_NonExistingItem_ReturnsNotFound()
     {
         //Arrange
         var updateRequest = new ToDoItemUpdateRequestDto("UpdatedTask", "UpdatedDesc", false);

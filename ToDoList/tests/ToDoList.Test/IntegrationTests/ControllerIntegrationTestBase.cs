@@ -10,10 +10,10 @@ public class ControllerIntegrationTestBase : IDisposable
     protected readonly ToDoItemsRepository Repository;
     public ControllerIntegrationTestBase()
     {
-        string connectingString = "Data Source=../../../IntegrationTests/data/localdb_test.db";
-        Context = new ToDoItemsContext(connectingString);
+        string connectionString = "Data Source=../../../IntegrationTests/data/localdb_test.db";
+        Context = new ToDoItemsContext(connectionString);
         Repository = new ToDoItemsRepository(Context);
-        Controller = new ToDoItemsController(Context, Repository);
+        Controller = new ToDoItemsController(Repository);
     }
 
     public void Dispose()

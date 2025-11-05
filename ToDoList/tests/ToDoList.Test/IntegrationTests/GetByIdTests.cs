@@ -3,10 +3,10 @@ namespace ToDoList.Test.IntegrationTests;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
 
-public class ReadByIdTests : ControllerIntegrationTestBase
+public class GetByIdTests : ControllerIntegrationTestBase
 {
     [Fact]
-    public void ReadById_ExistingItem_ReturnsItem()
+    public void GetById_ExistingItem_ReturnsItem()
     {
         //Arrange
         var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
@@ -25,7 +25,7 @@ public class ReadByIdTests : ControllerIntegrationTestBase
     }
 
     [Fact]
-    public void ReadById_NonExistingItem_ReturnsNotFound()
+    public void GetById_NonExistingItem_ReturnsNotFound()
     {
         //Arrange
         int nonExistingId = 999;
