@@ -2,13 +2,11 @@ namespace ToDoList.Test.IntegrationTests;
 
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
-using ToDoList.Persistence;
-using ToDoList.WebApi;
 
-public class CreateTests : ControllerTestBase
+public class PostTests : ControllerIntegrationTestBase
 {
     [Fact]
-    public void Create_ValidRequest_ReturnsCreatedItem()
+    public void PostValidRequestReturnsCreatedItem()
     {
         //Arrange
         var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
