@@ -7,7 +7,7 @@ public class PutTests : ControllerIntegrationTestBase
 {
 
     [Fact]
-    public void Put_ExistingItem_ReturnsNoContent()
+    public void PutExistingItemReturnsNoContent()
     {
         //Arrange
         var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
@@ -31,7 +31,7 @@ public class PutTests : ControllerIntegrationTestBase
     }
 
     [Fact]
-    public void Put_NonExistingItem_ReturnsNotFound()
+    public void PutNonExistingItemReturnsNotFound()
     {
         //Arrange
         var updateRequest = new ToDoItemUpdateRequestDto("UpdatedTask", "UpdatedDesc", false);

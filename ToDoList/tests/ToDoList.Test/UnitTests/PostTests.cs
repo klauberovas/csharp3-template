@@ -6,7 +6,7 @@ using ToDoList.Domain.DTOs;
 public class PostTests : ControllerUnitTestBase
 {
     [Fact]
-    public void Post_ValidRequest_ReturnsCreatedItem()
+    public void PostValidRequestReturnsCreatedItem()
     {
         //Arrange
         var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false);

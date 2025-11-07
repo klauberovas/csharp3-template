@@ -6,7 +6,7 @@ using ToDoList.Domain.DTOs;
 public class GetByIdTests : ControllerIntegrationTestBase
 {
     [Fact]
-    public void GetById_ExistingItem_ReturnsItem()
+    public void GetByIdExistingItemReturnsItem()
     {
         //Arrange
         var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
@@ -25,7 +25,7 @@ public class GetByIdTests : ControllerIntegrationTestBase
     }
 
     [Fact]
-    public void GetById_NonExistingItem_ReturnsNotFound()
+    public void GetByIdNonExistingItemReturnsNotFound()
     {
         //Arrange
         int nonExistingId = 999;

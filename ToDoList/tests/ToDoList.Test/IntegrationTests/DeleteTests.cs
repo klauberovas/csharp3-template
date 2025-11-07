@@ -6,7 +6,7 @@ using ToDoList.Domain.DTOs;
 public class DeleteTests : ControllerIntegrationTestBase
 {
     [Fact]
-    public void DeleteById_ExistingItem_ReturnsNoContent()
+    public void DeleteByIdExistingItemReturnsNoContent()
     {
         //Arrange
         var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", true);
@@ -23,7 +23,7 @@ public class DeleteTests : ControllerIntegrationTestBase
     }
 
     [Fact]
-    public void DeleteById_ExistingItem_RemovesOnlyTarget()
+    public void DeleteByIdExistingItemRemovesOnlyTarget()
     {
         //Arrange
         var createRequest1 = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
@@ -34,7 +34,7 @@ public class DeleteTests : ControllerIntegrationTestBase
         //Act
         Controller.DeleteById(createdItem1.Id);
         var readResult = Controller.Read();
-        var remainingItems = readResult.GetValue();
+        var remainingItems = readResult.GetValue()!;
 
         //Assert
         Assert.Single(remainingItems);
@@ -42,7 +42,7 @@ public class DeleteTests : ControllerIntegrationTestBase
     }
 
     [Fact]
-    public void DeleteById_NonExistingItem_ReturnsNotFound()
+    public void DeleteByIdNonExistingItemReturnsNotFound()
     {
         //Arrange
         var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", true);

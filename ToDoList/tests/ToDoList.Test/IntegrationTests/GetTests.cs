@@ -7,7 +7,7 @@ public class GetTests : ControllerIntegrationTestBase
 {
 
     [Fact]
-    public void Get_ItemsExist_ReturnsAllItems()
+    public void GetItemsExistReturnsAllItems()
     {
         //Arrange
         var createRequest1 = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
@@ -31,7 +31,7 @@ public class GetTests : ControllerIntegrationTestBase
     }
 
     [Fact]
-    public void Get_NoItems_ReturnsNotFound()
+    public void GetNoItemsReturnsNotFound()
     {
         //Act
         var readResult = Controller.Read();
