@@ -5,7 +5,7 @@ public interface IRepository<T>
 {
     public void Create(T item);
     public IEnumerable<T> Read();
-    public T ReadById(int id);
+    public T? ReadById(int id);
     public void Update(T item);
     public void Delete(T item);
 }
