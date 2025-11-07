@@ -6,8 +6,8 @@ using ToDoList.Persistence.Repositories;
 using ToDoList.WebApi;
 public class ControllerUnitTestBase
 {
-    protected readonly ToDoItemsController Controller;
-    protected readonly IRepository<ToDoItem> RepositoryMock;
+    protected ToDoItemsController Controller { get; }
+    protected IRepository<ToDoItem> RepositoryMock { get; }
 
     public ControllerUnitTestBase()
     {

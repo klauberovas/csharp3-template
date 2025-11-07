@@ -5,9 +5,9 @@ using ToDoList.Persistence.Repositories;
 using ToDoList.WebApi;
 public class ControllerIntegrationTestBase : IDisposable
 {
-    protected readonly ToDoItemsController Controller;
-    protected readonly ToDoItemsContext Context;
-    protected readonly ToDoItemsRepository Repository;
+    protected ToDoItemsController Controller { get; }
+    protected ToDoItemsContext Context { get; }
+    protected ToDoItemsRepository Repository { get; }
     public ControllerIntegrationTestBase()
     {
         string connectionString = "Data Source=../../../IntegrationTests/data/localdb_test.db";
