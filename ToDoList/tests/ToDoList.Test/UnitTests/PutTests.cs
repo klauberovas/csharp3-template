@@ -12,7 +12,7 @@ public class PutTests : ControllerUnitTestBase
     public void Put_ItemExist_ReturnsNoContent()
     {
         //Arrange
-        var createRequest = new ToDoItemUpdateRequestDto("Task1", "Desc1", false);
+        var updateRequest = new ToDoItemUpdateRequestDto("Task1", "Desc1", false);
         var existingItem = new ToDoItem { ToDoItemId = 1, Name = "OldTask", Description = "OldDesc", IsCompleted = true };
 
         RepositoryMock.ReadById(1).Returns(existingItem);
@@ -22,10 +22,10 @@ public class PutTests : ControllerUnitTestBase
 
 
         //Act
-        var result = Controller.UpdateById(1, createRequest);
+        var updatedResult = Controller.UpdateById(1, updateRequest);
 
         //Assert
-        var noContentResult = Assert.IsType<NoContentResult>(result);
+        var noContentResult = Assert.IsType<NoContentResult>(updatedResult);
         Assert.Equal(204, noContentResult.StatusCode);
 
         RepositoryMock.Received(1).ReadById(1);
@@ -36,14 +36,14 @@ public class PutTests : ControllerUnitTestBase
     public void Put_ItemDoesNotExist_ReturnsNotFound()
     {
         //Arrange
-        var createRequest = new ToDoItemUpdateRequestDto("Task1", "Desc1", false);
+        var updateRequest = new ToDoItemUpdateRequestDto("Task1", "Desc1", false);
         RepositoryMock.ReadById(1).ReturnsNull();
 
         //Act
-        var result = Controller.UpdateById(1, createRequest);
+        var updatedResult = Controller.UpdateById(1, updateRequest);
 
         //Assert
-        Assert.IsType<NotFoundResult>(result);
+        Assert.IsType<NotFoundResult>(updatedResult);
         RepositoryMock.Received(1).ReadById(1);
         RepositoryMock.DidNotReceive().Update(Arg.Any<ToDoItem>());
     }
@@ -52,7 +52,7 @@ public class PutTests : ControllerUnitTestBase
     public void Put_RepositoryThrowsException_ReturnsProblem500()
     {
         //Arrange
-        var createRequest = new ToDoItemUpdateRequestDto("Task1", "Desc1", false);
+        var updateRequest = new ToDoItemUpdateRequestDto("Task1", "Desc1", false);
         var existingItem = new ToDoItem { ToDoItemId = 1, Name = "OldTask", Description = "OldDesc", IsCompleted = true };
 
         RepositoryMock.ReadById(1).Returns(existingItem);
@@ -61,10 +61,10 @@ public class PutTests : ControllerUnitTestBase
             .Do(_ => throw new InvalidOperationException("Database error"));
 
         //Act
-        var result = Controller.UpdateById(1, createRequest);
+        var updatedResult = Controller.UpdateById(1, updateRequest);
 
         //Assert
-        var objectResult = Assert.IsType<ObjectResult>(result);
+        var objectResult = Assert.IsType<ObjectResult>(updatedResult);
         Assert.Equal(500, objectResult.StatusCode);
 
         var problem = Assert.IsType<ProblemDetails>(objectResult.Value);

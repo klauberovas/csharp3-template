@@ -42,10 +42,10 @@ public class GetTests : ControllerUnitTestBase
         RepositoryMock.Read().Returns([]);
 
         //Act
-        var result = Controller.Read();
+        var readResult = Controller.Read();
 
         //Assert
-        Assert.IsType<NotFoundResult>(result.Result);
+        Assert.IsType<NotFoundResult>(readResult.Result);
         RepositoryMock.Received(1).Read();
     }
 
@@ -58,10 +58,10 @@ public class GetTests : ControllerUnitTestBase
             .Do(_ => throw new InvalidOperationException("Database error"));
 
         //Act
-        var result = Controller.Read();
+        var readResult = Controller.Read();
 
         //Assert
-        var objectResult = Assert.IsType<ObjectResult>(result.Result);
+        var objectResult = Assert.IsType<ObjectResult>(readResult.Result);
         Assert.Equal(500, objectResult.StatusCode);
 
         var problem = Assert.IsType<ProblemDetails>(objectResult.Value);

@@ -42,10 +42,10 @@ public class PostTests : ControllerUnitTestBase
             .When(x => x.Create(Arg.Any<ToDoItem>()))
             .Do(_ => throw new InvalidOperationException("Database error"));
         //Act
-        var result = Controller.Create(createRequest);
+        var createResult = Controller.Create(createRequest);
 
         //Assert
-        var objectResult = Assert.IsType<ObjectResult>(result.Result);
+        var objectResult = Assert.IsType<ObjectResult>(createResult.Result);
         Assert.Equal(500, objectResult.StatusCode);
 
         var problem = Assert.IsType<ProblemDetails>(objectResult.Value);

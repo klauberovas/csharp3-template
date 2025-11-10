@@ -18,10 +18,10 @@ public class DeleteTests : ControllerUnitTestBase
         .Do(_ => { });
 
         //Act
-        var result = Controller.DeleteById(1);
+        var deleteResult = Controller.DeleteById(1);
 
         //Asssert
-        var noContentResult = Assert.IsType<NoContentResult>(result);
+        var noContentResult = Assert.IsType<NoContentResult>(deleteResult);
         Assert.Equal(204, noContentResult.StatusCode);
 
         RepositoryMock.Received(1).ReadById(1);
@@ -35,10 +35,10 @@ public class DeleteTests : ControllerUnitTestBase
         RepositoryMock.ReadById(1).ReturnsNull();
 
         //Act
-        var result = Controller.DeleteById(1);
+        var deleteResult = Controller.DeleteById(1);
 
         //Asssert
-        Assert.IsType<NotFoundResult>(result);
+        Assert.IsType<NotFoundResult>(deleteResult);
         RepositoryMock.Received(1).ReadById(1);
         RepositoryMock.DidNotReceive().Delete(Arg.Any<ToDoItem>());
     }
@@ -54,10 +54,10 @@ public class DeleteTests : ControllerUnitTestBase
         .Do(_ => throw new InvalidOperationException("Database error"));
 
         //Act
-        var result = Controller.DeleteById(1);
+        var deleteResult = Controller.DeleteById(1);
 
         //Asssert
-        var objectResult = Assert.IsType<ObjectResult>(result);
+        var objectResult = Assert.IsType<ObjectResult>(deleteResult);
         Assert.Equal(500, objectResult.StatusCode);
 
         var problem = Assert.IsType<ProblemDetails>(objectResult.Value);
