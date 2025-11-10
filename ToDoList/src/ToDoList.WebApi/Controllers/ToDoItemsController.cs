@@ -93,6 +93,7 @@ public class ToDoItemsController : ControllerBase
             }
 
             request.ApplyToDomain(item);
+            repository.Update(item);
 
             return NoContent();
         }
