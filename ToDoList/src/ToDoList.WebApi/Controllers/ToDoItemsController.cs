@@ -11,10 +11,7 @@ public class ToDoItemsController : ControllerBase
 {
     private readonly IRepository<ToDoItem> repository;
 
-    public ToDoItemsController(IRepository<ToDoItem> repository)
-    {
-        this.repository = repository;
-    }
+    public ToDoItemsController(IRepository<ToDoItem> repository) => this.repository = repository;
 
     [HttpPost]
     public ActionResult<ToDoItemGetResponseDto> Create(ToDoItemCreateRequestDto request)
@@ -93,6 +90,7 @@ public class ToDoItemsController : ControllerBase
             }
 
             request.ApplyToDomain(item);
+            repository.Update(item);
 
             return NoContent();
         }
