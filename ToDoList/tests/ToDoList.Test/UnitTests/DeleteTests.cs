@@ -1,7 +1,9 @@
 namespace ToDoList.Test.UnitTests;
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NSubstitute.ReturnsExtensions;
 using ToDoList.Domain.Models;
 
@@ -44,7 +46,7 @@ public class DeleteTests : ControllerUnitTestBase
     }
 
     [Fact]
-    public void Delete_RepositoryThrowsException_ReturnsProblem500()
+    public void Delete_AnyItemIdExceptionOccurredDuringDeleteById_ReturnsInternalServerError()
     {
         //Arrange
         var existingItem = new ToDoItem() { ToDoItemId = 1, Name = "Task", Description = "Desc", IsCompleted = true };
@@ -65,5 +67,23 @@ public class DeleteTests : ControllerUnitTestBase
 
         RepositoryMock.Received(1).ReadById(1);
         RepositoryMock.Received(1).Delete(existingItem);
+    }
+
+    [Fact]
+    public void Delete_AnyItemIdExceptionOccurredDuringReadById_ReturnsInternalServerError()
+    {
+        //Arrange
+        RepositoryMock.ReadById(Arg.Any<int>()).Throws(new Exception());
+        int id = 1;
+
+        //Act
+        var result = Controller.DeleteById(id);
+
+        //Assert
+        var objectResult = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(500, objectResult.StatusCode);
+
+        RepositoryMock.Received(1).ReadById(id);
+        RepositoryMock.DidNotReceive().Delete(Arg.Any<ToDoItem>());
     }
 }
