@@ -13,9 +13,7 @@ public class PutTests : ControllerUnitTestBase
     {
         //Arrange
         var updateRequest = new ToDoItemUpdateRequestDto("Task1", "Desc1", false);
-        var existingItem = new ToDoItem { ToDoItemId = 1, Name = "OldTask", Description = "OldDesc", IsCompleted = true };
 
-        RepositoryMock.ReadById(1).Returns(existingItem);
         RepositoryMock
             .When(x => x.Update(Arg.Any<ToDoItem>()))
             .Do(_ => { });
@@ -28,8 +26,7 @@ public class PutTests : ControllerUnitTestBase
         var noContentResult = Assert.IsType<NoContentResult>(updatedResult);
         Assert.Equal(204, noContentResult.StatusCode);
 
-        RepositoryMock.Received(1).ReadById(1);
-        RepositoryMock.Received(1).Update(existingItem);
+        RepositoryMock.Received(1).Update(Arg.Any<ToDoItem>());
     }
 
     [Fact]
@@ -37,15 +34,16 @@ public class PutTests : ControllerUnitTestBase
     {
         //Arrange
         var updateRequest = new ToDoItemUpdateRequestDto("Task1", "Desc1", false);
-        RepositoryMock.ReadById(1).ReturnsNull();
+        RepositoryMock
+        .When(x => x.Update(Arg.Any<ToDoItem>()))
+        .Do(_ => throw new ArgumentOutOfRangeException());
 
         //Act
         var updatedResult = Controller.UpdateById(1, updateRequest);
 
         //Assert
         Assert.IsType<NotFoundResult>(updatedResult);
-        RepositoryMock.Received(1).ReadById(1);
-        RepositoryMock.DidNotReceive().Update(Arg.Any<ToDoItem>());
+        RepositoryMock.Received().Update(Arg.Any<ToDoItem>());
     }
 
     [Fact]
