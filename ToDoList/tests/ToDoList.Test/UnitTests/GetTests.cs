@@ -7,7 +7,7 @@ using ToDoList.Domain.Models;
 public class GetTests : ControllerUnitTestBase
 {
     [Fact]
-    public void Get_ItemsExist_ReturnsAllItems()
+    public void Get_ReadWhenSomeItemAvailable_ReturnsOk()
     {
         //Arrange
         var items = new List<ToDoItem>
@@ -36,7 +36,7 @@ public class GetTests : ControllerUnitTestBase
     }
 
     [Fact]
-    public void Get_NoItems_ReturnsNotFound()
+    public void Get_ReadWhenNoItemAvailable_ReturnsNotFound()
     {
         //Arrange
         RepositoryMock.ReadAll().Returns([]);
@@ -50,7 +50,7 @@ public class GetTests : ControllerUnitTestBase
     }
 
     [Fact]
-    public void Get_RepositoryThrowsException_ReturnsProblem500()
+    public void Get_ReadUnhandledException_ReturnsInternalServerError()
     {
         //Arrange
         RepositoryMock

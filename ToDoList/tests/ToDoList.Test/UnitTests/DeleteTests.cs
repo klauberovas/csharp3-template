@@ -2,12 +2,11 @@ namespace ToDoList.Test.UnitTests;
 
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
-using ToDoList.Domain.Models;
 
 public class DeleteTests : ControllerUnitTestBase
 {
     [Fact]
-    public void DeleteById_ItemExists_ReturnsNoContent()
+    public void Delete_DeleteByIdValidItemId_ReturnsNoContent()
     {
         //Arrange
         int id = 1;
@@ -27,7 +26,7 @@ public class DeleteTests : ControllerUnitTestBase
     }
 
     [Fact]
-    public void DeleteById_ItemDoesNotExist_ReturnsNotFound()
+    public void Delete_DeleteByIdInvalidItemId_ReturnsNotFound()
     {
         //Arrange
         int id = 1;
@@ -40,11 +39,11 @@ public class DeleteTests : ControllerUnitTestBase
 
         //Asssert
         Assert.IsType<NotFoundResult>(deleteResult);
-        RepositoryMock.Received().DeleteById(id);
+        RepositoryMock.Received(1).DeleteById(id);
     }
 
     [Fact]
-    public void DeleteById_AnyItemIdExceptionOccurredDuringDeleteById_ReturnsInternalServerError()
+    public void Delete_DeleteByIdUnhandledException_ReturnsInternalServerError()
     {
         //Arrange
         int id = 1;
