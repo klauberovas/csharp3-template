@@ -1,5 +1,6 @@
 namespace ToDoList.Persistence.Repositories;
 
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ToDoList.Domain.Models;
 
 public class ToDoItemsRepository : IRepository<ToDoItem>
@@ -12,19 +13,25 @@ public class ToDoItemsRepository : IRepository<ToDoItem>
         context.SaveChanges();
     }
 
-    public IEnumerable<ToDoItem> Read() => context.ToDoItems.ToList();
+    public IEnumerable<ToDoItem> ReadAll() => context.ToDoItems.ToList();
 
     public ToDoItem? ReadById(int id) => context.ToDoItems.Find(id);
 
     public void Update(ToDoItem item)
     {
-        context.ToDoItems.Update(item);
+        var existingItem = context.ToDoItems.Find(item.ToDoItemId)
+        ?? throw new InvalidOperationException($"ToDo item with ID ${item.ToDoItemId} not found.");
+
+        context.Entry(existingItem).CurrentValues.SetValues(item);
         context.SaveChanges();
     }
 
-    public void Delete(ToDoItem item)
+    public void DeleteById(int id)
     {
-        context.Remove(item);
+        var existingItem = context.ToDoItems.Find(id)
+        ?? throw new InvalidOperationException($"ToDo item with ID {id} is not found.");
+
+        context.ToDoItems.Remove(existingItem);
         context.SaveChanges();
     }
 }

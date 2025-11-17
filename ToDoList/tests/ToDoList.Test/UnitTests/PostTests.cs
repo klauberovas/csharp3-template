@@ -8,7 +8,7 @@ using ToDoList.Domain.Models;
 public class PostTests : ControllerUnitTestBase
 {
     [Fact]
-    public void Post_ValidRequest_ReturnsCreatedItem()
+    public void Post_CreateValidRequest_ReturnsCreatedAtAction()
     {
         //Arrange
         var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
@@ -32,7 +32,7 @@ public class PostTests : ControllerUnitTestBase
     }
 
     [Fact]
-    public void Post_WhenRepositoryThrowsException_ReturnsProblem500()
+    public void Post_CreateUnhandledException_ReturnsInternalServerError()
     {
         //Arrange
         var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false);

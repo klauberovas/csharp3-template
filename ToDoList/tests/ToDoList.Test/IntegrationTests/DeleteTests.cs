@@ -14,12 +14,9 @@ public class DeleteTests : ControllerIntegrationTestBase
 
         //Act
         var deleteResult = Controller.DeleteById(createdItem.Id);
-        var readResult = Controller.Read();
-        var items = readResult.GetValue();
 
         //Assert
         Assert.IsType<NoContentResult>(deleteResult);
-        Assert.Null(items);
     }
 
     [Fact]

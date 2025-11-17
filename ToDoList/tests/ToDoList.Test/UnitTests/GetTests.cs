@@ -7,7 +7,7 @@ using ToDoList.Domain.Models;
 public class GetTests : ControllerUnitTestBase
 {
     [Fact]
-    public void Get_ItemsExist_ReturnsAllItems()
+    public void Get_ReadWhenSomeItemAvailable_ReturnsOk()
     {
         //Arrange
         var items = new List<ToDoItem>
@@ -16,7 +16,7 @@ public class GetTests : ControllerUnitTestBase
             new() {ToDoItemId = 2, Name = "Task2", Description= "Desc2", IsCompleted = false }
         };
 
-        RepositoryMock.Read().Returns(items);
+        RepositoryMock.ReadAll().Returns(items);
 
         //Act
         var readResult = Controller.Read();
@@ -32,29 +32,29 @@ public class GetTests : ControllerUnitTestBase
         Assert.NotNull(firstItem);
         Assert.NotNull(secondItem);
 
-        RepositoryMock.Received(1).Read();
+        RepositoryMock.Received(1).ReadAll();
     }
 
     [Fact]
-    public void Get_NoItems_ReturnsNotFound()
+    public void Get_ReadWhenNoItemAvailable_ReturnsNotFound()
     {
         //Arrange
-        RepositoryMock.Read().Returns([]);
+        RepositoryMock.ReadAll().Returns([]);
 
         //Act
         var readResult = Controller.Read();
 
         //Assert
         Assert.IsType<NotFoundResult>(readResult.Result);
-        RepositoryMock.Received(1).Read();
+        RepositoryMock.Received(1).ReadAll();
     }
 
     [Fact]
-    public void Get_RepositoryThrowsException_ReturnsProblem500()
+    public void Get_ReadUnhandledException_ReturnsInternalServerError()
     {
         //Arrange
         RepositoryMock
-            .When(x => x.Read())
+            .When(x => x.ReadAll())
             .Do(_ => throw new InvalidOperationException("Database error"));
 
         //Act

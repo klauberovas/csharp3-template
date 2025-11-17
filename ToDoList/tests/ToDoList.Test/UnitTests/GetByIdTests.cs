@@ -8,7 +8,7 @@ using ToDoList.Domain.Models;
 public class GetByIdTests : ControllerUnitTestBase
 {
     [Fact]
-    public void GetById_ItemExists_ReturnsItem()
+    public void Get_ReadByIdWhenSomeItemAvailable_ReturnsOk()
     {
         //Arrange
         var toDoItem = new ToDoItem() { ToDoItemId = 1, Name = "Task", Description = "Desc", IsCompleted = false };
@@ -19,15 +19,17 @@ public class GetByIdTests : ControllerUnitTestBase
         var dto = readByIdResult.GetValue();
 
         //Assert
+        Assert.IsType<OkObjectResult>(readByIdResult.Result);
         Assert.NotNull(dto);
         Assert.Equal(toDoItem.Name, dto.Name);
         Assert.Equal(toDoItem.Description, dto.Description);
         Assert.Equal(toDoItem.IsCompleted, dto.IsCompleted);
+
         RepositoryMock.Received(1).ReadById(1);
     }
 
     [Fact]
-    public void GetById_ItemDoesNotExist_ReturnsNotFound()
+    public void Get_ReadByIdWhenItemIsNull_ReturnsNotFound()
     {
         //Arrange
         RepositoryMock.ReadById(1).ReturnsNull();
@@ -41,7 +43,7 @@ public class GetByIdTests : ControllerUnitTestBase
     }
 
     [Fact]
-    public void GetById_RepositoryThrowsException_ReturnsProblem500()
+    public void Get_ReadByIdUnhandledException_ReturnsInternalServerError()
     {
         //Arrange
         RepositoryMock

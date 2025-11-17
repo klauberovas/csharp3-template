@@ -36,68 +36,59 @@ public class ToDoItemsController : ControllerBase
     [HttpGet]
     public ActionResult<IEnumerable<ToDoItemGetResponseDto>> Read()
     {
+        IEnumerable<ToDoItem> itemsToGet;
         try
         {
-            var items = repository.Read();
-            if (!items.Any())
-            {
-                return NotFound();
-            }
-
-            var dtoList = items
-            .Select(ToDoItemGetResponseDto.FromDomain)
-            .ToList();
-
-            return Ok(dtoList);
+            itemsToGet = repository.ReadAll();
         }
         catch (Exception ex)
         {
             return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
         }
+
+        return (!itemsToGet.Any())
+        ? NotFound()
+        : Ok(itemsToGet.Select(ToDoItemGetResponseDto.FromDomain));
     }
 
     [HttpGet("{toDoItemId:int}")]
     public ActionResult<ToDoItemGetResponseDto> ReadById(int toDoItemId)
     {
+        ToDoItem? itemToGet;
         try
         {
-            var item = repository.ReadById(toDoItemId);
-
-            if (item == null)
-            {
-                return NotFound();
-            }
-
-            var dto = ToDoItemGetResponseDto.FromDomain(item);
-            return Ok(dto);
+            itemToGet = repository.ReadById(toDoItemId);
         }
         catch (Exception ex)
         {
             return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
         }
+
+        return (itemToGet is null)
+        ? NotFound()
+        : Ok(ToDoItemGetResponseDto.FromDomain(itemToGet));
     }
 
     [HttpPut("{toDoItemId:int}")]
     public IActionResult UpdateById(int toDoItemId, [FromBody] ToDoItemUpdateRequestDto request)
     {
+        var updatedItem = request.ToDomain();
+        updatedItem.ToDoItemId = toDoItemId;
+
         try
         {
-            var item = repository.ReadById(toDoItemId);
-
-            if (item == null)
-            {
-                return NotFound();
-            }
-
-            request.ApplyToDomain(item);
-            repository.Update(item);
-
-            return NoContent();
+            repository.Update(updatedItem);
+        }
+        catch (InvalidOperationException)
+        {
+            return NotFound();
         }
         catch (Exception ex)
         {
             return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
         }
+
+        return NoContent();
     }
 
     [HttpDelete("{toDoItemId:int}")]
@@ -105,20 +96,17 @@ public class ToDoItemsController : ControllerBase
     {
         try
         {
-            var item = repository.ReadById(toDoItemId);
-
-            if (item == null)
-            {
-                return NotFound();
-            }
-
-            repository.Delete(item);
-
-            return NoContent();
+            repository.DeleteById(toDoItemId);
+        }
+        catch (InvalidOperationException)
+        {
+            return NotFound();
         }
         catch (Exception ex)
         {
             return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
         }
+
+        return NoContent();
     }
 }
