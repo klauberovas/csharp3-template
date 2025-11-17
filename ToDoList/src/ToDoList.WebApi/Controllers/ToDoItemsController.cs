@@ -79,7 +79,7 @@ public class ToDoItemsController : ControllerBase
         {
             repository.Update(updatedItem);
         }
-        catch (ArgumentOutOfRangeException)
+        catch (InvalidOperationException)
         {
             return NotFound();
         }
@@ -98,7 +98,7 @@ public class ToDoItemsController : ControllerBase
         {
             repository.DeleteById(toDoItemId);
         }
-        catch (ArgumentOutOfRangeException)
+        catch (InvalidOperationException)
         {
             return NotFound();
         }

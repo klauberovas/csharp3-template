@@ -1,6 +1,7 @@
 namespace ToDoList.Test.UnitTests;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 
 public class DeleteTests : ControllerUnitTestBase
@@ -32,7 +33,7 @@ public class DeleteTests : ControllerUnitTestBase
         int id = 1;
         RepositoryMock
         .When(x => x.DeleteById(id))
-        .Do(_ => throw new ArgumentOutOfRangeException());
+        .Do(_ => throw new InvalidOperationException());
 
         //Act
         var deleteResult = Controller.DeleteById(id);
@@ -50,7 +51,7 @@ public class DeleteTests : ControllerUnitTestBase
 
         RepositoryMock
         .When(x => x.DeleteById(id))
-        .Do(_ => throw new InvalidOperationException("Database error"));
+        .Do(_ => throw new DbUpdateConcurrencyException("Database error"));
 
         //Act
         var deleteResult = Controller.DeleteById(id);

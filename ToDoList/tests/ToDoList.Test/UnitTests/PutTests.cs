@@ -1,6 +1,7 @@
 namespace ToDoList.Test.UnitTests;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 using ToDoList.Domain.DTOs;
 using ToDoList.Domain.Models;
@@ -34,7 +35,7 @@ public class PutTests : ControllerUnitTestBase
         var updateRequest = new ToDoItemUpdateRequestDto("Task1", "Desc1", false);
         RepositoryMock
         .When(x => x.Update(Arg.Any<ToDoItem>()))
-        .Do(_ => throw new ArgumentOutOfRangeException());
+        .Do(_ => throw new InvalidOperationException());
 
         //Act
         var updatedResult = Controller.UpdateById(1, updateRequest);
@@ -53,7 +54,7 @@ public class PutTests : ControllerUnitTestBase
 
         RepositoryMock
             .When(x => x.Update(Arg.Any<ToDoItem>()))
-            .Do(_ => throw new InvalidOperationException("Database error"));
+            .Do(_ => throw new DbUpdateConcurrencyException("Database error"));
 
         //Act
         var updatedResult = Controller.UpdateById(1, updateRequest);

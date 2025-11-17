@@ -1,5 +1,6 @@
 namespace ToDoList.Persistence.Repositories;
 
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ToDoList.Domain.Models;
 
 public class ToDoItemsRepository : IRepository<ToDoItem>
@@ -19,7 +20,7 @@ public class ToDoItemsRepository : IRepository<ToDoItem>
     public void Update(ToDoItem item)
     {
         var existingItem = context.ToDoItems.Find(item.ToDoItemId)
-        ?? throw new ArgumentOutOfRangeException($"ToDo item with ID ${item.ToDoItemId} not found.");
+        ?? throw new InvalidOperationException($"ToDo item with ID ${item.ToDoItemId} not found.");
 
         context.Entry(existingItem).CurrentValues.SetValues(item);
         context.SaveChanges();
@@ -28,7 +29,7 @@ public class ToDoItemsRepository : IRepository<ToDoItem>
     public void DeleteById(int id)
     {
         var existingItem = context.ToDoItems.Find(id)
-        ?? throw new ArgumentOutOfRangeException($"ToDo item with ID {id} is not found.");
+        ?? throw new InvalidOperationException($"ToDo item with ID {id} is not found.");
 
         context.ToDoItems.Remove(existingItem);
         context.SaveChanges();
