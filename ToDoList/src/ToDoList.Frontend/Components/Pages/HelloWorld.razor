@@ -1,0 +1,19 @@
+﻿@page "/ahojSvete"
+
+<PageTitle>Ahoj světe</PageTitle>
+
+<h1>@AhojSvete()</h1>
+
+<b style="color:#2222fa;">@GetDate()</b>
+
+@code {
+    private string AhojSvete()
+    {
+        return "Ahoj světe";
+    }
+
+    private String GetDate()
+    {
+        return DateTime.Now.ToShortDateString();
+    }
+}
