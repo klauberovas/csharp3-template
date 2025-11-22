@@ -1,28 +1,48 @@
-﻿@using Microsoft.VisualBasic
+﻿@using Microsoft.AspNetCore.Mvc
+@using Microsoft.VisualBasic
+@using System.Diagnostics
 @using ToDoList.Frontend.Models
-<div>
-    <h2>ToDo items dashboard</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Název</th>
-                <th>Popis</th>
-                <th>Dokončeno</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in testData)
-            {
+@rendermode InteractiveServer
+<div class="container mt-4">
+    <h2 class="mb-3 fw-bold text-center">Seznam úkolů</h2>
+
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle rounded shadow-sm">
+            <thead class="table-dark text-center">
                 <tr>
-                    <td>@item.Id</td>
-                    <td>@item.Name</td>
-                    <td>@item.Description</td>
-                    <td>@(item.IsCompleted ? "Dokončený" : "Nedokončený")</td>
+                    <th>
+                        ID
+                        <button class="btn btn-sm btn-outline-light ms-1"
+                            @onclick="() => SortBy(i => i.Id, true)">↓</button>
+                        <button class="btn btn-sm btn-outline-light ms-1"
+                            @onclick="() => SortBy(i => i.Id, false)">↑</button>
+                    </th>
+                    <th>
+                        Název
+                        <button class="btn btn-sm btn-outline-light ms-1"
+                            @onclick="() => SortBy(i => i.Name, true)">↓</button>
+                        <button class="btn btn-sm btn-outline-light ms-1"
+                            @onclick="() => SortBy(i => i.Name, false)">↑</button>
+                    </th>
+                    <th>Popis</th>
+                    <th>Dokončeno</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var item in testData)
+                {
+                    <tr>
+                        <td class="text-center">@item.Id</td>
+                        <td>@item.Name</td>
+                        <td>@item.Description</td>
+                        <td class="text-center"><span
+                                class="badge @(item.IsCompleted ? "bg-success" : "bg-warning")">@(item.IsCompleted ?
+                                                            "Dokončený" : "Nedokončený")</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 @code {
     private List<ToDoItemView> testData = new List<ToDoItemView>()
@@ -33,4 +53,11 @@ new ToDoItemView(3, "Zavolat mamince", "Domluvit víkend", false),
 new ToDoItemView(4, "Cvičit", "Běhání v parku", false),
 new ToDoItemView(5, "Přečíst knihu", "Kapitola 5", true)
 };
+
+    private void SortBy<T>(Func<ToDoItemView, T> selector, bool asc)
+    {
+        testData = asc
+        ? testData.OrderBy(selector).ToList()
+        : testData.OrderByDescending(selector).ToList();
+    }
 }
