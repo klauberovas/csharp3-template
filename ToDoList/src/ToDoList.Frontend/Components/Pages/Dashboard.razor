@@ -1,8 +1,12 @@
 ﻿@using Microsoft.AspNetCore.Mvc
 @using Microsoft.VisualBasic
 @using System.Diagnostics
+@using System.Threading.Tasks
+@using ToDoList.Frontend.Clients
 @using ToDoList.Frontend.Models
 @rendermode InteractiveServer
+@inject IToDoItemsClient toDoItemsClient
+
 <div class="container mt-4">
     <h2 class="mb-3 fw-bold text-center">Seznam úkolů</h2>
 
@@ -25,39 +29,46 @@
                             @onclick="() => SortBy(i => i.Name, false)">↑</button>
                     </th>
                     <th>Popis</th>
-                    <th>Dokončeno</th>
+                    <th>
+                        Dokončeno
+                        <button class="btn btn-sm btn-outline-light ms-1"
+                            @onclick="() => SortBy(i => i.IsCompleted, true)">↓</button>
+                        <button class="btn btn-sm btn-outline-light ms-1"
+                            @onclick="() => SortBy(i => i.IsCompleted, false)">↑</button>
+                    </th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in testData)
+                @if (toDoItemViews is not null)
                 {
-                    <tr>
-                        <td class="text-center">@item.Id</td>
-                        <td>@item.Name</td>
-                        <td>@item.Description</td>
-                        <td class="text-center"><span
-                                class="badge @(item.IsCompleted ? "bg-success" : "bg-warning")">@(item.IsCompleted ?
-                                                            "Dokončený" : "Nedokončený")</span></td>
-                    </tr>
+                    @foreach (var item in toDoItemViews)
+                    {
+                        <tr>
+                            <td class="text-center">@item.Id</td>
+                            <td>@item.Name</td>
+                            <td>@item.Description</td>
+                            <td class="text-center"><span
+                                    class="badge @(item.IsCompleted ? "bg-success" : "bg-warning")">@(item.IsCompleted ?
+                                                                "Dokončený" : "Nedokončený")</span></td>
+                        </tr>
+                    }
                 }
+
             </tbody>
         </table>
     </div>
 </div>
 @code {
-    private List<ToDoItemView> testData = new List<ToDoItemView>()
-{
-new ToDoItemView(1, "Nakoupit potraviny", "Mléko, chléb, vejce", false),
-new ToDoItemView(2, "Dokončit projekt", "Implementovat všechny funkce", true),
-new ToDoItemView(3, "Zavolat mamince", "Domluvit víkend", false),
-new ToDoItemView(4, "Cvičit", "Běhání v parku", false),
-new ToDoItemView(5, "Přečíst knihu", "Kapitola 5", true)
-};
-
+    private List<ToDoItemView>? toDoItemViews;
+    protected override async Task OnInitializedAsync()
+    {
+        toDoItemViews = await toDoItemsClient.ReadItemsAsync();
+    }
     private void SortBy<T>(Func<ToDoItemView, T> selector, bool asc)
     {
-        testData = asc
-        ? testData.OrderBy(selector).ToList()
-        : testData.OrderByDescending(selector).ToList();
+        toDoItemViews = asc
+        ? toDoItemViews?.OrderBy(selector).ToList()
+        : toDoItemViews?.OrderByDescending(selector).ToList();
     }
+
 }
