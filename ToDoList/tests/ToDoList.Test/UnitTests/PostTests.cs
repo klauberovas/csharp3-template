@@ -1,5 +1,6 @@
 namespace ToDoList.Test.UnitTests;
 
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using ToDoList.Domain.DTOs;
@@ -8,16 +9,16 @@ using ToDoList.Domain.Models;
 public class PostTests : ControllerUnitTestBase
 {
     [Fact]
-    public void Post_CreateValidRequest_ReturnsCreatedAtAction()
+    public async Task Post_CreateValidRequest_ReturnsCreatedAtAction()
     {
         //Arrange
         var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
         RepositoryMock
-            .When(x => x.Create(Arg.Any<ToDoItem>()))
+            .When(async x => await x.CreateAsync(Arg.Any<ToDoItem>()))
             .Do(_ => { });
 
         //Act
-        var createResult = Controller.Create(createRequest);
+        var createResult = await Controller.CreateAsync(createRequest);
 
         //Assert
         var createdAtResult = Assert.IsType<CreatedAtActionResult>(createResult.Result);
@@ -28,21 +29,21 @@ public class PostTests : ControllerUnitTestBase
         Assert.Equal(createRequest.Description, createdItem.Description);
         Assert.Equal(createRequest.IsCompleted, createdItem.IsCompleted);
 
-        RepositoryMock.Received(1).Create(Arg.Any<ToDoItem>());
+        await RepositoryMock.Received(1).CreateAsync(Arg.Any<ToDoItem>());
     }
 
     [Fact]
-    public void Post_CreateUnhandledException_ReturnsInternalServerError()
+    public async Task Post_CreateUnhandledException_ReturnsInternalServerError()
     {
         //Arrange
         var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
 
         //Mock
         RepositoryMock
-            .When(x => x.Create(Arg.Any<ToDoItem>()))
+            .When(async x => await x.CreateAsync(Arg.Any<ToDoItem>()))
             .Do(_ => throw new InvalidOperationException("Database error"));
         //Act
-        var createResult = Controller.Create(createRequest);
+        var createResult = await Controller.CreateAsync(createRequest);
 
         //Assert
         var objectResult = Assert.IsType<ObjectResult>(createResult.Result);

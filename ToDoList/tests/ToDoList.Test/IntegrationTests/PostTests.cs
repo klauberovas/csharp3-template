@@ -1,18 +1,19 @@
 namespace ToDoList.Test.IntegrationTests;
 
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
 
 public class PostTests : ControllerIntegrationTestBase
 {
     [Fact]
-    public void PostValidRequestReturnsCreatedItem()
+    public async Task PostValidRequestReturnsCreatedItem()
     {
         //Arrange
         var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
 
         //Act
-        var createResult = Controller.Create(createRequest);
+        var createResult = await Controller.CreateAsync(createRequest);
 
         //Assert
         var createdAtResult = Assert.IsType<CreatedAtActionResult>(createResult.Result);

@@ -1,5 +1,6 @@
 namespace ToDoList.Test.UnitTests;
 
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using ToDoList.Domain.Models;
@@ -7,7 +8,7 @@ using ToDoList.Domain.Models;
 public class GetTests : ControllerUnitTestBase
 {
     [Fact]
-    public void Get_ReadWhenSomeItemAvailable_ReturnsOk()
+    public async Task Get_ReadWhenSomeItemAvailable_ReturnsOk()
     {
         //Arrange
         var items = new List<ToDoItem>
@@ -16,10 +17,10 @@ public class GetTests : ControllerUnitTestBase
             new() {ToDoItemId = 2, Name = "Task2", Description= "Desc2", IsCompleted = false }
         };
 
-        RepositoryMock.ReadAll().Returns(items);
+        RepositoryMock.ReadAllAsync().Returns(items);
 
         //Act
-        var readResult = Controller.Read();
+        var readResult = await Controller.ReadAsync();
         var allItems = readResult.GetValue();
 
         //Assert
@@ -32,33 +33,33 @@ public class GetTests : ControllerUnitTestBase
         Assert.NotNull(firstItem);
         Assert.NotNull(secondItem);
 
-        RepositoryMock.Received(1).ReadAll();
+        await RepositoryMock.Received(1).ReadAllAsync();
     }
 
     [Fact]
-    public void Get_ReadWhenNoItemAvailable_ReturnsNotFound()
+    public async Task Get_ReadWhenNoItemAvailable_ReturnsNotFound()
     {
         //Arrange
-        RepositoryMock.ReadAll().Returns([]);
+        RepositoryMock.ReadAllAsync().Returns([]);
 
         //Act
-        var readResult = Controller.Read();
+        var readResult = await Controller.ReadAsync();
 
         //Assert
         Assert.IsType<NotFoundResult>(readResult.Result);
-        RepositoryMock.Received(1).ReadAll();
+        await RepositoryMock.Received(1).ReadAllAsync();
     }
 
     [Fact]
-    public void Get_ReadUnhandledException_ReturnsInternalServerError()
+    public async Task Get_ReadUnhandledException_ReturnsInternalServerError()
     {
         //Arrange
         RepositoryMock
-            .When(x => x.ReadAll())
+            .When(async x => await x.ReadAllAsync())
             .Do(_ => throw new InvalidOperationException("Database error"));
 
         //Act
-        var readResult = Controller.Read();
+        var readResult = await Controller.ReadAsync();
 
         //Assert
         var objectResult = Assert.IsType<ObjectResult>(readResult.Result);

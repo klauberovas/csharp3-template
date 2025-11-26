@@ -7,54 +7,54 @@ using NSubstitute;
 public class DeleteTests : ControllerUnitTestBase
 {
     [Fact]
-    public void Delete_DeleteByIdValidItemId_ReturnsNoContent()
+    public async Task Delete_DeleteByIdValidItemId_ReturnsNoContent()
     {
         //Arrange
         int id = 1;
 
         RepositoryMock
-        .When(x => x.DeleteById(id))
+        .When(async x => await x.DeleteByIdAsync(id))
         .Do(_ => { });
 
         //Act
-        var deleteResult = Controller.DeleteById(id);
+        var deleteResult = await Controller.DeleteByIdAsync(id);
 
         //Asssert
         var noContentResult = Assert.IsType<NoContentResult>(deleteResult);
         Assert.Equal(204, noContentResult.StatusCode);
 
-        RepositoryMock.Received(1).DeleteById(id);
+        await RepositoryMock.Received(1).DeleteByIdAsync(id);
     }
 
     [Fact]
-    public void Delete_DeleteByIdInvalidItemId_ReturnsNotFound()
+    public async Task Delete_DeleteByIdInvalidItemId_ReturnsNotFound()
     {
         //Arrange
         int id = 1;
         RepositoryMock
-        .When(x => x.DeleteById(id))
+        .When(async x => await x.DeleteByIdAsync(id))
         .Do(_ => throw new InvalidOperationException());
 
         //Act
-        var deleteResult = Controller.DeleteById(id);
+        var deleteResult = await Controller.DeleteByIdAsync(id);
 
         //Asssert
         Assert.IsType<NotFoundResult>(deleteResult);
-        RepositoryMock.Received(1).DeleteById(id);
+        await RepositoryMock.Received(1).DeleteByIdAsync(id);
     }
 
     [Fact]
-    public void Delete_DeleteByIdUnhandledException_ReturnsInternalServerError()
+    public async Task Delete_DeleteByIdUnhandledException_ReturnsInternalServerError()
     {
         //Arrange
         int id = 1;
 
         RepositoryMock
-        .When(x => x.DeleteById(id))
+        .When(async x => await x.DeleteByIdAsync(id))
         .Do(_ => throw new DbUpdateConcurrencyException("Database error"));
 
         //Act
-        var deleteResult = Controller.DeleteById(id);
+        var deleteResult = await Controller.DeleteByIdAsync(id);
 
         //Asssert
         var objectResult = Assert.IsType<ObjectResult>(deleteResult);
@@ -63,6 +63,6 @@ public class DeleteTests : ControllerUnitTestBase
         var problem = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal("Database error", problem.Detail);
 
-        RepositoryMock.Received(1).DeleteById(id);
+        await RepositoryMock.Received(1).DeleteByIdAsync(id);
     }
 }
