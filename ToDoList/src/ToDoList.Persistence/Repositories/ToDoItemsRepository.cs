@@ -32,6 +32,6 @@ public class ToDoItemsRepository : IRepositoryAsync<ToDoItem>
         ?? throw new InvalidOperationException($"ToDo item with ID {id} is not found.");
 
         context.ToDoItems.Remove(existingItem);
-        context.SaveChangesAsync();
+        await context.SaveChangesAsync();
     }
 }
