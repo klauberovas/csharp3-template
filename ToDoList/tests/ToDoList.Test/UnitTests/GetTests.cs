@@ -13,14 +13,14 @@ public class GetTests : ControllerUnitTestBase
         //Arrange
         var items = new List<ToDoItem>
         {
-            new() {ToDoItemId = 1, Name = "Task1", Description= "Desc1", IsCompleted = false },
-            new() {ToDoItemId = 2, Name = "Task2", Description= "Desc2", IsCompleted = false }
+            new() {ToDoItemId = 1, Name = "Task1", Description= "Desc1", IsCompleted = false, Category = null },
+            new() {ToDoItemId = 2, Name = "Task2", Description= "Desc2", IsCompleted = false, Category = "Category2" }
         };
 
         RepositoryMock.ReadAllAsync().Returns(items);
 
         //Act
-        var readResult = await Controller.ReadAsync();
+        var readResult = await Controller.Read();
         var allItems = readResult.GetValue();
 
         //Assert
@@ -43,7 +43,7 @@ public class GetTests : ControllerUnitTestBase
         RepositoryMock.ReadAllAsync().Returns([]);
 
         //Act
-        var readResult = await Controller.ReadAsync();
+        var readResult = await Controller.Read();
 
         //Assert
         Assert.IsType<NotFoundResult>(readResult.Result);
@@ -59,7 +59,7 @@ public class GetTests : ControllerUnitTestBase
             .Do(_ => throw new InvalidOperationException("Database error"));
 
         //Act
-        var readResult = await Controller.ReadAsync();
+        var readResult = await Controller.Read();
 
         //Assert
         var objectResult = Assert.IsType<ObjectResult>(readResult.Result);

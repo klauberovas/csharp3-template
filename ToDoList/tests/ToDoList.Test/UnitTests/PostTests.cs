@@ -12,13 +12,13 @@ public class PostTests : ControllerUnitTestBase
     public async Task Post_CreateValidRequest_ReturnsCreatedAtAction()
     {
         //Arrange
-        var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
+        var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false, null);
         RepositoryMock
             .When(async x => await x.CreateAsync(Arg.Any<ToDoItem>()))
             .Do(_ => { });
 
         //Act
-        var createResult = await Controller.CreateAsync(createRequest);
+        var createResult = await Controller.Create(createRequest);
 
         //Assert
         var createdAtResult = Assert.IsType<CreatedAtActionResult>(createResult.Result);
@@ -36,14 +36,14 @@ public class PostTests : ControllerUnitTestBase
     public async Task Post_CreateUnhandledException_ReturnsInternalServerError()
     {
         //Arrange
-        var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
+        var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false, null);
 
         //Mock
         RepositoryMock
             .When(async x => await x.CreateAsync(Arg.Any<ToDoItem>()))
             .Do(_ => throw new InvalidOperationException("Database error"));
         //Act
-        var createResult = await Controller.CreateAsync(createRequest);
+        var createResult = await Controller.Create(createRequest);
 
         //Assert
         var objectResult = Assert.IsType<ObjectResult>(createResult.Result);

@@ -10,11 +10,11 @@ public class DeleteTests : ControllerIntegrationTestBase
     public async Task DeleteByIdExistingItemReturnsNoContent()
     {
         //Arrange
-        var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", true);
-        var createdItem = (await Controller.CreateAsync(createRequest)).GetValue()!;
+        var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", true, null);
+        var createdItem = (await Controller.Create(createRequest)).GetValue()!;
 
         //Act
-        var deleteResult = await Controller.DeleteByIdAsync(createdItem.Id);
+        var deleteResult = await Controller.DeleteById(createdItem.Id);
 
         //Assert
         Assert.IsType<NoContentResult>(deleteResult);
@@ -24,14 +24,14 @@ public class DeleteTests : ControllerIntegrationTestBase
     public async Task DeleteByIdExistingItemRemovesOnlyTarget()
     {
         //Arrange
-        var createRequest1 = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
-        var createRequest2 = new ToDoItemCreateRequestDto("Task2", "Desc12", false);
-        var createdItem1 = (await Controller.CreateAsync(createRequest1)).GetValue()!;
-        var createdItem2 = (await Controller.CreateAsync(createRequest2)).GetValue()!;
+        var createRequest1 = new ToDoItemCreateRequestDto("Task1", "Desc1", false, null);
+        var createRequest2 = new ToDoItemCreateRequestDto("Task2", "Desc12", false, "Category");
+        var createdItem1 = (await Controller.Create(createRequest1)).GetValue()!;
+        var createdItem2 = (await Controller.Create(createRequest2)).GetValue()!;
 
         //Act
-        await Controller.DeleteByIdAsync(createdItem1.Id);
-        var readResult = await Controller.ReadAsync();
+        await Controller.DeleteById(createdItem1.Id);
+        var readResult = await Controller.Read();
         var remainingItems = readResult.GetValue()!;
 
         //Assert
@@ -43,13 +43,13 @@ public class DeleteTests : ControllerIntegrationTestBase
     public async Task DeleteByIdNonExistingItemReturnsNotFound()
     {
         //Arrange
-        var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", true);
-        var createdItem = (await Controller.CreateAsync(createRequest)).GetValue()!;
+        var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", true, null);
+        var createdItem = (await Controller.Create(createRequest)).GetValue()!;
         int nonExistingId = createdItem.Id + 1;
 
         //Act
-        var deleteResult = await Controller.DeleteByIdAsync(nonExistingId);
-        var readResult = await Controller.ReadAsync();
+        var deleteResult = await Controller.DeleteById(nonExistingId);
+        var readResult = await Controller.Read();
         var items = readResult.GetValue();
 
         //Assert
