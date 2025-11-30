@@ -1,19 +1,20 @@
 namespace ToDoList.Test.IntegrationTests;
 
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
 
 public class GetByIdTests : ControllerIntegrationTestBase
 {
     [Fact]
-    public void GetByIdExistingItemReturnsItem()
+    public async Task GetByIdExistingItemReturnsItem()
     {
         //Arrange
         var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
-        var createdItem = Controller.Create(createRequest).GetValue()!;
+        var createdItem = (await Controller.CreateAsync(createRequest)).GetValue()!;
 
         //Act
-        var readResult = Controller.ReadById(createdItem.Id);
+        var readResult = await Controller.ReadByIdAsync(createdItem.Id);
         var foundItem = readResult.GetValue();
 
         //Assert
@@ -25,13 +26,13 @@ public class GetByIdTests : ControllerIntegrationTestBase
     }
 
     [Fact]
-    public void GetByIdNonExistingItemReturnsNotFound()
+    public async Task GetByIdNonExistingItemReturnsNotFound()
     {
         //Arrange
         int nonExistingId = 999;
 
         //Act
-        var readResult = Controller.ReadById(nonExistingId);
+        var readResult = await Controller.ReadByIdAsync(nonExistingId);
         var item = readResult.GetValue();
 
         //Assert

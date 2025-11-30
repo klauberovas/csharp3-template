@@ -7,17 +7,17 @@ public class PutTests : ControllerIntegrationTestBase
 {
 
     [Fact]
-    public void PutExistingItemReturnsNoContent()
+    public async Task PutExistingItemReturnsNoContent()
     {
         //Arrange
         var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
         var updateRequest = new ToDoItemUpdateRequestDto("UpdateTask", "UpdateDesc", true);
 
-        var createdItem = Controller.Create(createRequest).GetValue()!;
+        var createdItem = (await Controller.CreateAsync(createRequest)).GetValue()!;
 
         //Act
-        var updateResult = Controller.UpdateById(createdItem.Id, updateRequest);
-        var updatedItem = Controller.ReadById(createdItem.Id).GetValue();
+        var updateResult = await Controller.UpdateByIdAsync(createdItem.Id, updateRequest);
+        var updatedItem = (await Controller.ReadByIdAsync(createdItem.Id)).GetValue();
 
         //Assert
         Assert.IsType<NoContentResult>(updateResult);
@@ -31,14 +31,14 @@ public class PutTests : ControllerIntegrationTestBase
     }
 
     [Fact]
-    public void PutNonExistingItemReturnsNotFound()
+    public async Task PutNonExistingItemReturnsNotFound()
     {
         //Arrange
         var updateRequest = new ToDoItemUpdateRequestDto("UpdatedTask", "UpdatedDesc", false);
         int nonExistingId = 999;
 
         //Act
-        var updateResult = Controller.UpdateById(nonExistingId, updateRequest);
+        var updateResult = await Controller.UpdateByIdAsync(nonExistingId, updateRequest);
 
         //Assert
         Assert.IsType<NotFoundResult>(updateResult);

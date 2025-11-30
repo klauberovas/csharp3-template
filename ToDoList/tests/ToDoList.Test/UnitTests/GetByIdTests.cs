@@ -8,14 +8,14 @@ using ToDoList.Domain.Models;
 public class GetByIdTests : ControllerUnitTestBase
 {
     [Fact]
-    public void Get_ReadByIdWhenSomeItemAvailable_ReturnsOk()
+    public async Task Get_ReadByIdWhenSomeItemAvailable_ReturnsOk()
     {
         //Arrange
         var toDoItem = new ToDoItem() { ToDoItemId = 1, Name = "Task", Description = "Desc", IsCompleted = false };
-        RepositoryMock.ReadById(1).Returns(toDoItem);
+        RepositoryMock.ReadByIdAsync(1).Returns(toDoItem);
 
         //Act
-        var readByIdResult = Controller.ReadById(1);
+        var readByIdResult = await Controller.ReadByIdAsync(1);
         var dto = readByIdResult.GetValue();
 
         //Assert
@@ -25,33 +25,33 @@ public class GetByIdTests : ControllerUnitTestBase
         Assert.Equal(toDoItem.Description, dto.Description);
         Assert.Equal(toDoItem.IsCompleted, dto.IsCompleted);
 
-        RepositoryMock.Received(1).ReadById(1);
+        await RepositoryMock.Received(1).ReadByIdAsync(1);
     }
 
     [Fact]
-    public void Get_ReadByIdWhenItemIsNull_ReturnsNotFound()
+    public async Task Get_ReadByIdWhenItemIsNull_ReturnsNotFound()
     {
         //Arrange
-        RepositoryMock.ReadById(1).ReturnsNull();
+        RepositoryMock.ReadByIdAsync(1).ReturnsNull();
 
         //Act
-        var readByIdResult = Controller.ReadById(1);
+        var readByIdResult = await Controller.ReadByIdAsync(1);
 
         //Assert
         Assert.IsType<NotFoundResult>(readByIdResult.Result);
-        RepositoryMock.Received(1).ReadById(1);
+        await RepositoryMock.Received(1).ReadByIdAsync(1);
     }
 
     [Fact]
-    public void Get_ReadByIdUnhandledException_ReturnsInternalServerError()
+    public async Task Get_ReadByIdUnhandledException_ReturnsInternalServerError()
     {
         //Arrange
         RepositoryMock
-            .When(x => x.ReadById(1))
+            .When(async x => await x.ReadByIdAsync(1))
             .Do(_ => throw new InvalidOperationException("Database error"));
 
         //Act
-        var readByIdResult = Controller.ReadById(1);
+        var readByIdResult = await Controller.ReadByIdAsync(1);
 
         //Assert
         var objectResult = Assert.IsType<ObjectResult>(readByIdResult.Result);

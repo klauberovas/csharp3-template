@@ -1,37 +1,37 @@
 namespace ToDoList.Persistence.Repositories;
 
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore;
 using ToDoList.Domain.Models;
 
-public class ToDoItemsRepository : IRepository<ToDoItem>
+public class ToDoItemsRepository : IRepositoryAsync<ToDoItem>
 {
     private readonly ToDoItemsContext context;
     public ToDoItemsRepository(ToDoItemsContext context) => this.context = context;
-    public void Create(ToDoItem item)
+    public async Task CreateAsync(ToDoItem item)
     {
-        context.ToDoItems.Add(item);
-        context.SaveChanges();
+        await context.ToDoItems.AddAsync(item);
+        await context.SaveChangesAsync();
     }
 
-    public IEnumerable<ToDoItem> ReadAll() => context.ToDoItems.ToList();
+    public async Task<List<ToDoItem>> ReadAllAsync() => await context.ToDoItems.ToListAsync();
 
-    public ToDoItem? ReadById(int id) => context.ToDoItems.Find(id);
+    public async Task<ToDoItem?> ReadByIdAsync(int id) => await context.ToDoItems.FindAsync(id);
 
-    public void Update(ToDoItem item)
+    public async Task UpdateAsync(ToDoItem item)
     {
-        var existingItem = context.ToDoItems.Find(item.ToDoItemId)
+        var existingItem = await context.ToDoItems.FindAsync(item.ToDoItemId)
         ?? throw new InvalidOperationException($"ToDo item with ID ${item.ToDoItemId} not found.");
 
         context.Entry(existingItem).CurrentValues.SetValues(item);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
     }
 
-    public void DeleteById(int id)
+    public async Task DeleteByIdAsync(int id)
     {
-        var existingItem = context.ToDoItems.Find(id)
+        var existingItem = await context.ToDoItems.FindAsync(id)
         ?? throw new InvalidOperationException($"ToDo item with ID {id} is not found.");
 
         context.ToDoItems.Remove(existingItem);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
     }
 }

@@ -1,5 +1,6 @@
 namespace ToDoList.Test.IntegrationTests;
 
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
 
@@ -7,17 +8,17 @@ public class GetTests : ControllerIntegrationTestBase
 {
 
     [Fact]
-    public void GetItemsExistReturnsAllItems()
+    public async Task GetItemsExistReturnsAllItems()
     {
         //Arrange
         var createRequest1 = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
         var createRequest2 = new ToDoItemCreateRequestDto("Task2", "Desc2", false);
 
-        Controller.Create(createRequest1);
-        Controller.Create(createRequest2);
+        await Controller.CreateAsync(createRequest1);
+        await Controller.CreateAsync(createRequest2);
 
         //Act
-        var readResult = Controller.Read();
+        var readResult = await Controller.ReadAsync();
         var allItems = readResult.GetValue();
 
         //Assert
@@ -31,10 +32,10 @@ public class GetTests : ControllerIntegrationTestBase
     }
 
     [Fact]
-    public void GetNoItemsReturnsNotFound()
+    public async Task GetNoItemsReturnsNotFound()
     {
         //Act
-        var readResult = Controller.Read();
+        var readResult = await Controller.ReadAsync();
 
         //Assert
         Assert.IsType<NotFoundResult>(readResult.Result);
