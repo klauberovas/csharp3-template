@@ -10,11 +10,11 @@ public class GetByIdTests : ControllerIntegrationTestBase
     public async Task GetByIdExistingItemReturnsItem()
     {
         //Arrange
-        var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
-        var createdItem = (await Controller.CreateAsync(createRequest)).GetValue()!;
+        var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false, null);
+        var createdItem = (await Controller.Create(createRequest)).GetValue()!;
 
         //Act
-        var readResult = await Controller.ReadByIdAsync(createdItem.Id);
+        var readResult = await Controller.ReadById(createdItem.Id);
         var foundItem = readResult.GetValue();
 
         //Assert
@@ -23,6 +23,7 @@ public class GetByIdTests : ControllerIntegrationTestBase
         Assert.Equal(createdItem.Id, foundItem.Id);
         Assert.Equal(createRequest.Description, foundItem.Description);
         Assert.Equal(createRequest.IsCompleted, foundItem.IsCompleted);
+        Assert.Equal(createRequest.Category, foundItem.Category);
     }
 
     [Fact]
@@ -32,7 +33,7 @@ public class GetByIdTests : ControllerIntegrationTestBase
         int nonExistingId = 999;
 
         //Act
-        var readResult = await Controller.ReadByIdAsync(nonExistingId);
+        var readResult = await Controller.ReadById(nonExistingId);
         var item = readResult.GetValue();
 
         //Assert

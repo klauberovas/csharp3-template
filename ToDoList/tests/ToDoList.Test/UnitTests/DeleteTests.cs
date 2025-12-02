@@ -17,7 +17,7 @@ public class DeleteTests : ControllerUnitTestBase
         .Do(_ => { });
 
         //Act
-        var deleteResult = await Controller.DeleteByIdAsync(id);
+        var deleteResult = await Controller.DeleteById(id);
 
         //Asssert
         var noContentResult = Assert.IsType<NoContentResult>(deleteResult);
@@ -36,7 +36,7 @@ public class DeleteTests : ControllerUnitTestBase
         .Do(_ => throw new InvalidOperationException());
 
         //Act
-        var deleteResult = await Controller.DeleteByIdAsync(id);
+        var deleteResult = await Controller.DeleteById(id);
 
         //Asssert
         Assert.IsType<NotFoundResult>(deleteResult);
@@ -54,7 +54,7 @@ public class DeleteTests : ControllerUnitTestBase
         .Do(_ => throw new DbUpdateConcurrencyException("Database error"));
 
         //Act
-        var deleteResult = await Controller.DeleteByIdAsync(id);
+        var deleteResult = await Controller.DeleteById(id);
 
         //Asssert
         var objectResult = Assert.IsType<ObjectResult>(deleteResult);

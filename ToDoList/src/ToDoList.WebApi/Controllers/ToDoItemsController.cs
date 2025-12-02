@@ -15,7 +15,7 @@ public class ToDoItemsController : ControllerBase
     public ToDoItemsController(IRepositoryAsync<ToDoItem> repository) => this.repository = repository;
 
     [HttpPost]
-    public async Task<ActionResult<ToDoItemGetResponseDto>> CreateAsync(ToDoItemCreateRequestDto request)
+    public async Task<ActionResult<ToDoItemGetResponseDto>> Create(ToDoItemCreateRequestDto request)
     {
         var item = request.ToDomain();
 
@@ -29,13 +29,13 @@ public class ToDoItemsController : ControllerBase
         }
 
         return CreatedAtAction(
-            nameof(ReadByIdAsync),
+            nameof(ReadById),
             new { toDoItemId = item.ToDoItemId },
             ToDoItemGetResponseDto.FromDomain(item));
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ToDoItemGetResponseDto>>> ReadAsync()
+    public async Task<ActionResult<IEnumerable<ToDoItemGetResponseDto>>> Read()
     {
         IEnumerable<ToDoItem> itemsToGet;
         try
@@ -53,7 +53,7 @@ public class ToDoItemsController : ControllerBase
     }
 
     [HttpGet("{toDoItemId:int}")]
-    public async Task<ActionResult<ToDoItemGetResponseDto>> ReadByIdAsync(int toDoItemId)
+    public async Task<ActionResult<ToDoItemGetResponseDto>> ReadById(int toDoItemId)
     {
         ToDoItem? itemToGet;
         try
@@ -71,7 +71,7 @@ public class ToDoItemsController : ControllerBase
     }
 
     [HttpPut("{toDoItemId:int}")]
-    public async Task<IActionResult> UpdateByIdAsync(int toDoItemId, [FromBody] ToDoItemUpdateRequestDto request)
+    public async Task<IActionResult> UpdateById(int toDoItemId, [FromBody] ToDoItemUpdateRequestDto request)
     {
         var updatedItem = request.ToDomain();
         updatedItem.ToDoItemId = toDoItemId;
@@ -93,7 +93,7 @@ public class ToDoItemsController : ControllerBase
     }
 
     [HttpDelete("{toDoItemId:int}")]
-    public async Task<IActionResult> DeleteByIdAsync(int toDoItemId)
+    public async Task<IActionResult> DeleteById(int toDoItemId)
     {
         try
         {

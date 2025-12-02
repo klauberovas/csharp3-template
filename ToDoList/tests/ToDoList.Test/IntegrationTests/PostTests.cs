@@ -10,10 +10,10 @@ public class PostTests : ControllerIntegrationTestBase
     public async Task PostValidRequestReturnsCreatedItem()
     {
         //Arrange
-        var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false);
+        var createRequest = new ToDoItemCreateRequestDto("Task1", "Desc1", false, null);
 
         //Act
-        var createResult = await Controller.CreateAsync(createRequest);
+        var createResult = await Controller.Create(createRequest);
 
         //Assert
         var createdAtResult = Assert.IsType<CreatedAtActionResult>(createResult.Result);
@@ -23,5 +23,6 @@ public class PostTests : ControllerIntegrationTestBase
         Assert.Equal(createRequest.Name, createdItem.Name);
         Assert.Equal(createRequest.Description, createdItem.Description);
         Assert.Equal(createRequest.IsCompleted, createdItem.IsCompleted);
+        Assert.Equal(createRequest.Category, createdItem.Category);
     }
 }
