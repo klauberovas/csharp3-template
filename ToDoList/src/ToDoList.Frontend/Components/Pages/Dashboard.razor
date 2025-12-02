@@ -5,6 +5,7 @@
 @using ToDoList.Frontend.Clients
 @using ToDoList.Frontend.Models
 @rendermode InteractiveServer
+@inject NavigationManager NavigationManager
 @inject IToDoItemsClient toDoItemsClient
 
 <div class="container mt-4">
@@ -36,6 +37,8 @@
                         <button class="btn btn-sm btn-outline-light ms-1"
                             @onclick="() => SortBy(i => i.IsCompleted, false)">↑</button>
                     </th>
+                    <th>Kategorie</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -50,10 +53,11 @@
                             <td class="text-center"><span
                                     class="badge @(item.IsCompleted ? "bg-success" : "bg-warning")">@(item.IsCompleted ?
                                                                 "Dokončený" : "Nedokončený")</span></td>
+                            <td>@item.Category</td>
+                            <td><button class="btn btn-sucess" @onclick="() => EditItem(item)">Edit</button></td>
                         </tr>
                     }
                 }
-
             </tbody>
         </table>
     </div>
@@ -69,5 +73,10 @@
         toDoItemViews = asc
         ? toDoItemViews?.OrderBy(selector).ToList()
         : toDoItemViews?.OrderByDescending(selector).ToList();
+    }
+
+    public void EditItem(ToDoItemView toDoItem)
+    {
+        NavigationManager.NavigateTo(uri: $"editToDoItem/{toDoItem.Id}");
     }
 }
