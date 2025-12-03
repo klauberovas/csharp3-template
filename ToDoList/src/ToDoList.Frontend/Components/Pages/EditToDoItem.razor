@@ -5,17 +5,59 @@
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
+<PageTitle>Edit</PageTitle>
+
 @if (ToDoItemModel is not null)
 {
-    <EditForm Model="ToDoItemModel" FormName="" OnSubmit="Submit">
-        <div class="mb-3">
-            <label for="Name" class="form-label">Jméno
-                <InputText id="Name" @bind-Value="ToDoItemModel.Name" class="form-control" />
-            </label>
-            <InputCheckbox id="IsCompleted" @bind-Value="ToDoItemModel.IsCompleted" />
-            <button type="submit">Odeslat</button>
+    <EditForm Model="ToDoItemModel" FormName="EditToDoItem" OnSubmit="Submit" class="was-validated">
+        <div class="container mt-4" style="max-width: 520px;">
+            <div class="card shadow-sm rounded">
+
+                <!-- Hlavička formuláře -->
+                <div class="card-header bg-dark text-white text-center rounded-top">
+                    <h4 class="mb-0">Upravit úkol</h4>
+                </div>
+
+                <!-- Tělo formuláře -->
+                <div class="card-body p-4">
+
+                    <!-- Jméno -->
+                    <div class="mb-3">
+                        <label for="Name" class="form-label fw-semibold">*Jméno</label>
+                        <InputText id="Name" @bind-Value="ToDoItemModel.Name"
+                            class="form-control border border-primary-subtle" placeholder="Zadejte název" required />
+                    </div>
+
+                    <!-- Popis -->
+                    <div class="mb-3">
+                        <label for="Description" class="form-label fw-semibold">*Popis</label>
+                        <InputText id="Description" @bind-Value="ToDoItemModel.Description"
+                            class="form-control border border-primary-subtle" placeholder="Zadejte popis úkolu" required />
+                    </div>
+
+                    <!-- Kategorie -->
+                    <div class="mb-3">
+                        <label for="Category" class="form-label fw-semibold">Kategorie</label>
+                        <InputText id="Category" @bind-Value="ToDoItemModel.Category" class="form-control"
+                            placeholder="Zadejte kategorii" />
+                    </div>
+
+                    <!-- Dokončeno -->
+                    <div class="mb-4 form-check">
+                        <InputCheckbox id="IsCompleted" @bind-Value="ToDoItemModel.IsCompleted" class="form-check-input" />
+                        <label for="IsCompleted" class="form-check-label ms-1">Dokončeno</label>
+                    </div>
+
+                    <!-- Odeslat -->
+                    <button type="submit" class="btn btn-primary w-100 fw-semibold">
+                        Odeslat
+                    </button>
+
+                </div>
+            </div>
         </div>
     </EditForm>
+
 }
 
 
