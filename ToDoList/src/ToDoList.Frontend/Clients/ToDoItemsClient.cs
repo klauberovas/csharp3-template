@@ -9,26 +9,52 @@ public class ToDoItemsClient : IToDoItemsClient
     {
         this.httpClient = httpClient;
     }
-    public async Task<List<ToDoItemView>> ReadItemsAsync()
-    {
-        var toDoItemViews = new List<ToDoItemView>();
-        var response = await httpClient.GetFromJsonAsync<List<ToDoItemGetResponseDto>>("api/ToDoItems");
 
-        toDoItemViews = response.Select(dto => new ToDoItemView()
+    public async Task<ToDoItemView> CreateItemAsync(ToDoItemView item)
+    {
+        var request = new ToDoItemCreateRequestDto(item.Name, item.Description, item.IsCompleted, item.Category);
+        var response = await httpClient.PostAsJsonAsync("api/ToDoItems", request);
+        response.EnsureSuccessStatusCode();
+
+        var dto = await response.Content.ReadFromJsonAsync<ToDoItemGetResponseDto>();
+
+        return new ToDoItemView
         {
             Id = dto.Id,
             Name = dto.Name,
             Description = dto.Description,
             IsCompleted = dto.IsCompleted,
             Category = dto.Category
-        }).ToList();
+        };
+    }
+    public async Task<List<ToDoItemView>> ReadItemsAsync()
+    {
+        var toDoItemViews = new List<ToDoItemView>();
 
-        return toDoItemViews ?? [];
+        try
+        {
+            var response = await httpClient.GetFromJsonAsync<List<ToDoItemGetResponseDto>>("api/ToDoItems");
+            toDoItemViews = response.Select(dto => new ToDoItemView()
+            {
+                Id = dto.Id,
+                Name = dto.Name,
+                Description = dto.Description,
+                IsCompleted = dto.IsCompleted,
+                Category = dto.Category
+            }).ToList();
+
+            return toDoItemViews;
+        }
+        catch
+        {
+            return toDoItemViews;
+        }
+
     }
 
-    public async Task<ToDoItemView> ReadItemByIdAsync(int itemdId)
+    public async Task<ToDoItemView> ReadItemByIdAsync(int itemId)
     {
-        var response = await httpClient.GetFromJsonAsync<ToDoItemGetResponseDto>($"api/ToDoItems/{itemdId}");
+        var response = await httpClient.GetFromJsonAsync<ToDoItemGetResponseDto>($"api/ToDoItems/{itemId}");
 
         var toDoItem = new ToDoItemView()
         {
@@ -48,6 +74,8 @@ public class ToDoItemsClient : IToDoItemsClient
         var itemRequest = new ToDoItemUpdateRequestDto(item.Name, item.Description, item.IsCompleted, item.Category);
         await httpClient.PutAsJsonAsync($"api/ToDoItems/{item.Id}", itemRequest);
     }
+
+    public async Task DeleteItemAsync(int itemId) => await httpClient.DeleteAsync($"api/ToDoItems/{itemId}");
 }
 
 

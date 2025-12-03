@@ -8,7 +8,7 @@
 @inject NavigationManager NavigationManager
 @inject IToDoItemsClient toDoItemsClient
 
-<div class="container mt-4">
+<div class="container mt-4 mb-5">
 
     <h2 class="mb-3 fw-bold text-center">Seznam úkolů</h2>
 
@@ -57,30 +57,44 @@
                     {
                         <tr class="align-middle">
 
+                            <!-- ID -->
                             <td class="text-center fw-semibold">@item.Id</td>
+
+                            <!-- Name -->
                             <td>@item.Name</td>
+
+                            <!-- Description -->
                             <td class="d-none d-sm-table-cell">@item.Description</td>
+
+                            <!-- Category -->
                             <td class="d-none d-md-table-cell">@item.Category</td>
 
+                            <!-- IsCompleted -->
                             <td class="text-center">
                                 <span class="badge rounded-pill @(item.IsCompleted ? "bg-success" : "bg-warning")">
                                     @(item.IsCompleted ? "Dokončený" : "Nedokončený")
                                 </span>
                             </td>
 
+                            <!-- Actions -->
                             <td class="text-center">
                                 <div class="d-flex justify-content-center flex-wrap">
+
+                                    <!-- Edit -->
                                     <button class="btn btn-sm btn-outline-primary rounded p-1 me-1 mb-1"
                                         @onclick="() => EditItem(item)" title="Editovat">
                                         <i class="bi bi-pencil-square fs-5"></i>
                                     </button>
 
+                                    <!-- Toggle -->
                                     <button class="btn btn-sm btn-outline-success rounded p-1 me-1 mb-1"
                                         title="Přepnout splněnost">
                                         <i class="bi @(item.IsCompleted ? "bi-x-circle" : "bi-check-circle") fs-5"></i>
                                     </button>
 
-                                    <button class="btn btn-sm btn-outline-danger rounded p-1 mb-1" title="Smazat">
+                                    <!-- Delete -->
+                                    <button class="btn btn-sm btn-outline-danger rounded p-1 mb-1" title="Smazat"
+                                        @onclick="() => DeleteItem(item.Id)">
                                         <i class="bi bi-trash3 fs-5"></i>
                                     </button>
                                 </div>
@@ -111,5 +125,11 @@
     public void EditItem(ToDoItemView toDoItem)
     {
         NavigationManager.NavigateTo(uri: $"editToDoItem/{toDoItem.Id}");
+    }
+
+    public async Task DeleteItem(int id)
+    {
+        await toDoItemsClient.DeleteItemAsync(id);
+        toDoItemViews = await toDoItemsClient.ReadItemsAsync();
     }
 }

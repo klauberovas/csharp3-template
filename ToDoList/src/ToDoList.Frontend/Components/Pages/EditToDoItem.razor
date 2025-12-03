@@ -13,42 +13,42 @@
         <div class="container mt-4" style="max-width: 520px;">
             <div class="card shadow-sm rounded">
 
-                <!-- Hlavička formuláře -->
+                <!-- Header -->
                 <div class="card-header bg-dark text-white text-center rounded-top">
                     <h4 class="mb-0">Upravit úkol</h4>
                 </div>
 
-                <!-- Tělo formuláře -->
+                <!-- Body -->
                 <div class="card-body p-4">
 
-                    <!-- Jméno -->
+                    <!-- Name -->
                     <div class="mb-3">
                         <label for="Name" class="form-label fw-semibold">*Jméno</label>
                         <InputText id="Name" @bind-Value="ToDoItemModel.Name"
                             class="form-control border border-primary-subtle" placeholder="Zadejte název" required />
                     </div>
 
-                    <!-- Popis -->
+                    <!-- Description -->
                     <div class="mb-3">
                         <label for="Description" class="form-label fw-semibold">*Popis</label>
                         <InputText id="Description" @bind-Value="ToDoItemModel.Description"
                             class="form-control border border-primary-subtle" placeholder="Zadejte popis úkolu" required />
                     </div>
 
-                    <!-- Kategorie -->
+                    <!-- Category -->
                     <div class="mb-3">
                         <label for="Category" class="form-label fw-semibold">Kategorie</label>
                         <InputText id="Category" @bind-Value="ToDoItemModel.Category" class="form-control"
                             placeholder="Zadejte kategorii" />
                     </div>
 
-                    <!-- Dokončeno -->
+                    <!-- IsCompleted -->
                     <div class="mb-4 form-check">
                         <InputCheckbox id="IsCompleted" @bind-Value="ToDoItemModel.IsCompleted" class="form-check-input" />
                         <label for="IsCompleted" class="form-check-label ms-1">Dokončeno</label>
                     </div>
 
-                    <!-- Odeslat -->
+                    <!-- Submit -->
                     <button type="submit" class="btn btn-primary w-100 fw-semibold">
                         Odeslat
                     </button>
