@@ -14,6 +14,7 @@ public class ToDoItemsClient : IToDoItemsClient
     {
         var request = new ToDoItemCreateRequestDto(item.Name, item.Description, item.IsCompleted, item.Category);
         var response = await httpClient.PostAsJsonAsync("api/ToDoItems", request);
+
         response.EnsureSuccessStatusCode();
 
         var dto = await response.Content.ReadFromJsonAsync<ToDoItemGetResponseDto>();
@@ -27,14 +28,16 @@ public class ToDoItemsClient : IToDoItemsClient
             Category = dto.Category
         };
     }
+
     public async Task<List<ToDoItemView>> ReadItemsAsync()
     {
         var toDoItemViews = new List<ToDoItemView>();
 
         try
         {
-            var response = await httpClient.GetFromJsonAsync<List<ToDoItemGetResponseDto>>("api/ToDoItems");
-            toDoItemViews = response.Select(dto => new ToDoItemView()
+            var dtos = await httpClient.GetFromJsonAsync<List<ToDoItemGetResponseDto>>("api/ToDoItems");
+
+            toDoItemViews = dtos.Select(dto => new ToDoItemView()
             {
                 Id = dto.Id,
                 Name = dto.Name,
@@ -45,37 +48,92 @@ public class ToDoItemsClient : IToDoItemsClient
 
             return toDoItemViews;
         }
-        catch
+        catch (HttpRequestException ex)
         {
+            Console.WriteLine($"Chyba při načítání úkolů: {ex.Message}");
             return toDoItemViews;
         }
-
     }
 
     public async Task<ToDoItemView> ReadItemByIdAsync(int itemId)
     {
-        var response = await httpClient.GetFromJsonAsync<ToDoItemGetResponseDto>($"api/ToDoItems/{itemId}");
-
-        var toDoItem = new ToDoItemView()
+        try
         {
-            Id = response.Id,
-            Name = response.Name,
-            Description = response.Description,
-            IsCompleted = response.IsCompleted,
-            Category = response.Category
-        };
+            var dto = await httpClient.GetFromJsonAsync<ToDoItemGetResponseDto>($"api/ToDoItems/{itemId}");
 
+            return new ToDoItemView()
+            {
+                Id = dto.Id,
+                Name = dto.Name,
+                Description = dto.Description,
+                IsCompleted = dto.IsCompleted,
+                Category = dto.Category
+            };
+        }
+        catch (HttpRequestException ex)
+        {
+            if (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+            if (ex.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+            {
+                throw new InvalidOperationException("Došlo k chybě na serveru (500). Zkuste to prosím později.");
+            }
 
-        return toDoItem;
+            throw;
+        }
     }
 
     public async Task UpdateItemAsync(ToDoItemView item)
     {
+
         var itemRequest = new ToDoItemUpdateRequestDto(item.Name, item.Description, item.IsCompleted, item.Category);
-        await httpClient.PutAsJsonAsync($"api/ToDoItems/{item.Id}", itemRequest);
+
+        try
+        {
+            var response = await httpClient.PutAsJsonAsync($"api/ToDoItems/{item.Id}", itemRequest);
+            response.EnsureSuccessStatusCode();
+        }
+        catch (HttpRequestException ex)
+        {
+            if (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                throw new InvalidOperationException($"Úkol s ID {item.Id} nebyl nalezen.", ex);
+            }
+
+
+            if (ex.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+            {
+                throw new InvalidOperationException("Došlo k chybě na serveru (500). Zkuste to později.", ex);
+            }
+
+            throw;
+        }
     }
 
-    public async Task DeleteItemAsync(int itemId) => await httpClient.DeleteAsync($"api/ToDoItems/{itemId}");
+    public async Task DeleteItemAsync(int itemId)
+    {
+        try
+        {
+            var response = await httpClient.DeleteAsync($"api/ToDoItems/{itemId}");
+            response.EnsureSuccessStatusCode();
+        }
+        catch (HttpRequestException ex)
+        {
+            if (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                throw new InvalidOperationException($"Úkol s ID {itemId} nebyl nalezen.", ex);
+            }
+
+            if (ex.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+            {
+                throw new InvalidOperationException("Došlo k chybě na serveru (500). Zkuste to později.", ex);
+            }
+
+            throw;
+        }
+    }
 }
 
 

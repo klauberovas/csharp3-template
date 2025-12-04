@@ -7,7 +7,14 @@
 
 <PageTitle>Edit</PageTitle>
 
-@if (ToDoItemModel is not null)
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
+
+
+else if (ToDoItemModel is not null)
 {
     <EditForm Model="ToDoItemModel" FormName="EditToDoItem" OnSubmit="Submit" class="was-validated">
         <div class="container mt-4" style="max-width: 520px;">
@@ -59,23 +66,52 @@
     </EditForm>
 
 }
+else
+{
+    <div class="text-center mt-4">
+        <h4 class="text-danger">Úkol nenalezen.</h4>
+    </div>
+}
 
 
 @code {
-    protected override async Task OnInitializedAsync()
-    {
-        ToDoItemModel = await toDoItemsClient.ReadItemByIdAsync(ItemId);
-    }
 
     [Parameter]
     public int ItemId { get; set; }
+    public string? ErrorMessage { get; set; }
 
     [SupplyParameterFromForm]
-    public ToDoItemView ToDoItemModel { get; set; }
+    public ToDoItemView? ToDoItemModel { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            ToDoItemModel = await toDoItemsClient.ReadItemByIdAsync(ItemId);
+            ErrorMessage = null;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+
+    }
 
     public async Task Submit()
     {
-        await toDoItemsClient.UpdateItemAsync(ToDoItemModel);
-        NavigationManager.NavigateTo("/");
+        try
+        {
+            await toDoItemsClient.UpdateItemAsync(ToDoItemModel);
+            NavigationManager.NavigateTo("/");
+            ErrorMessage = null;
+        }
+        catch (InvalidOperationException ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Došlo k chybě při ukládání: {ex.Message}";
+        }
     }
 }
