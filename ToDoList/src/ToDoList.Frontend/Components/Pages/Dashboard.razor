@@ -5,61 +5,119 @@
 @using ToDoList.Frontend.Clients
 @using ToDoList.Frontend.Models
 @rendermode InteractiveServer
+@inject NavigationManager NavigationManager
 @inject IToDoItemsClient toDoItemsClient
 
-<div class="container mt-4">
+<div class="container mt-4 mb-5">
+
     <h2 class="mb-3 fw-bold text-center">Seznam úkolů</h2>
 
-    <div class="table-responsive">
-        <table class="table table-hover table-bordered align-middle rounded shadow-sm">
-            <thead class="table-dark text-center">
+    <!-- Alert pro chybu -->
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="alert alert-danger">@ErrorMessage</div>
+    }
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered mb-0">
+
+            <thead class="table-dark text-center align-middle">
                 <tr>
-                    <th>
+                    <th class="text-center">
                         ID
-                        <button class="btn btn-sm btn-outline-light ms-1"
-                            @onclick="() => SortBy(i => i.Id, true)">↓</button>
-                        <button class="btn btn-sm btn-outline-light ms-1"
-                            @onclick="() => SortBy(i => i.Id, false)">↑</button>
+                        <div class="d-inline-flex ms-1">
+                            <button class="btn btn-sm btn-outline-secondary me-1"
+                                @onclick="() => SortBy(i => i.Id, true)">↓</button>
+                            <button class="btn btn-sm btn-outline-secondary"
+                                @onclick="() => SortBy(i => i.Id, false)">↑</button>
+                        </div>
                     </th>
-                    <th>
+                    <th class="text-center">
                         Název
-                        <button class="btn btn-sm btn-outline-light ms-1"
-                            @onclick="() => SortBy(i => i.Name, true)">↓</button>
-                        <button class="btn btn-sm btn-outline-light ms-1"
-                            @onclick="() => SortBy(i => i.Name, false)">↑</button>
+                        <div class="d-inline-flex ms-1">
+                            <button class="btn btn-sm btn-outline-secondary me-1"
+                                @onclick="() => SortBy(i => i.Name, true)">↓</button>
+                            <button class="btn btn-sm btn-outline-secondary"
+                                @onclick="() => SortBy(i => i.Name, false)">↑</button>
+                        </div>
                     </th>
-                    <th>Popis</th>
-                    <th>
+                    <th class="d-none d-sm-table-cell">Popis</th>
+                    <th class="d-none d-md-table-cell">Kategorie</th>
+                    <th class="text-center">
                         Dokončeno
-                        <button class="btn btn-sm btn-outline-light ms-1"
-                            @onclick="() => SortBy(i => i.IsCompleted, true)">↓</button>
-                        <button class="btn btn-sm btn-outline-light ms-1"
-                            @onclick="() => SortBy(i => i.IsCompleted, false)">↑</button>
+                        <div class="d-inline-flex ms-1">
+                            <button class="btn btn-sm btn-outline-secondary me-1"
+                                @onclick="() => SortBy(i => i.IsCompleted, true)">↓</button>
+                            <button class="btn btn-sm btn-outline-secondary"
+                                @onclick="() => SortBy(i => i.IsCompleted, false)">↑</button>
+                        </div>
                     </th>
+                    <th class="text-center">Akce</th>
                 </tr>
             </thead>
+
             <tbody>
                 @if (toDoItemViews is not null)
                 {
                     @foreach (var item in toDoItemViews)
                     {
-                        <tr>
-                            <td class="text-center">@item.Id</td>
+                        <tr class="align-middle">
+
+                            <!-- ID -->
+                            <td class="text-center fw-semibold">@item.Id</td>
+
+                            <!-- Name -->
                             <td>@item.Name</td>
-                            <td>@item.Description</td>
-                            <td class="text-center"><span
-                                    class="badge @(item.IsCompleted ? "bg-success" : "bg-warning")">@(item.IsCompleted ?
-                                                                "Dokončený" : "Nedokončený")</span></td>
+
+                            <!-- Description -->
+                            <td class="d-none d-sm-table-cell">@item.Description</td>
+
+                            <!-- Category -->
+                            <td class="d-none d-md-table-cell">@item.Category</td>
+
+                            <!-- IsCompleted -->
+                            <td class="text-center">
+                                <span class="badge rounded-pill @(item.IsCompleted ? "bg-success" : "bg-warning")">
+                                    @(item.IsCompleted ? "Dokončený" : "Nedokončený")
+                                </span>
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center flex-wrap">
+
+                                    <!-- Edit -->
+                                    <button class="btn btn-sm btn-outline-primary rounded p-1 me-1 mb-1"
+                                        @onclick="() => EditItem(item)" title="Editovat">
+                                        <i class="bi bi-pencil-square fs-5"></i>
+                                    </button>
+
+                                    <!-- Toggle -->
+                                    <button class="btn btn-sm btn-outline-success rounded p-1 me-1 mb-1"
+                                        title="Přepnout splněnost" @onclick="() => ToggleIsCompleted(item)">
+                                        <i class="bi @(item.IsCompleted ? "bi-x-circle" : "bi-check-circle") fs-5"></i>
+                                    </button>
+
+                                    <!-- Delete -->
+                                    <button class="btn btn-sm btn-outline-danger rounded p-1 mb-1" title="Smazat"
+                                        @onclick="() => DeleteItem(item.Id)">
+                                        <i class="bi bi-trash3 fs-5"></i>
+                                    </button>
+                                </div>
+                            </td>
+
                         </tr>
                     }
                 }
-
             </tbody>
+
         </table>
     </div>
 </div>
+
 @code {
     private List<ToDoItemView>? toDoItemViews;
+    private string? ErrorMessage { get; set; }
     protected override async Task OnInitializedAsync()
     {
         toDoItemViews = await toDoItemsClient.ReadItemsAsync();
@@ -69,5 +127,56 @@
         toDoItemViews = asc
         ? toDoItemViews?.OrderBy(selector).ToList()
         : toDoItemViews?.OrderByDescending(selector).ToList();
+    }
+
+    public void EditItem(ToDoItemView toDoItem)
+    {
+        NavigationManager.NavigateTo(uri: $"editToDoItem/{toDoItem.Id}");
+    }
+
+    public async Task ToggleIsCompleted(ToDoItemView item)
+    {
+        try
+        {
+            item.IsCompleted = !item.IsCompleted;
+            await toDoItemsClient.UpdateItemAsync(item);
+            toDoItemViews = await toDoItemsClient.ReadItemsAsync();
+            ErrorMessage = null;
+        }
+        catch (InvalidOperationException ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Došlo k neočekávané chybě: {ex.Message}";
+        }
+
+        StateHasChanged();
+    }
+
+    public async Task DeleteItem(int id)
+    {
+        try
+        {
+            var item = toDoItemViews?.FirstOrDefault(i => i.Id == id);
+            if (item is not null)
+            {
+                toDoItemViews!.Remove(item);
+            }
+
+            await toDoItemsClient.DeleteItemAsync(id);
+            ErrorMessage = null;
+        }
+        catch (InvalidOperationException ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Chyba při mazání: {ex.Message}";
+        }
+
+        StateHasChanged();
     }
 }
